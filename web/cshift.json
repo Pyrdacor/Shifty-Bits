@@ -1,0 +1,8 @@
+{
+	"name": "shiftybits-web",
+	"version": "0.1.0",
+	"type": "executable",
+	"sources": ["../src", "../platform/web"],
+	"backend": "wasm",
+	"output": "shiftybits.wasm"
+}

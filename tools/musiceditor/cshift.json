@@ -1,0 +1,17 @@
+{
+	"name": "MusicEditor",
+	"version": "0.1.0",
+	"type": "executable",
+	"sources": [
+		"src",
+		"../../src/gfx.csh",
+		"../../src/screenshot.csh",
+		"../../src/song.csh",
+		"../../src/music.csh",
+		"../../platform/native/audio.csh"
+	],
+	"output": "bin/MusicEditor",
+	"optimize": 2,
+	"includePaths": ["../../include"],
+	"links": ["../../libminifb.a", "gdi32", "opengl32", "user32", "winmm"]
+}

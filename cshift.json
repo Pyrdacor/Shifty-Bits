@@ -1,0 +1,10 @@
+{
+	"name": "ShiftyBits",
+	"version": "0.1.0",
+	"type": "executable",
+	"sources": ["src", "platform/native"],
+	"output": "bin/ShiftyBits",
+	"optimize": 2,
+	"includePaths": ["include"],
+	"links": ["libminifb.a", "gdi32", "opengl32", "user32", "winmm"]
+}
