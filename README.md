@@ -1,5 +1,7 @@
 # Shifty Bits
 
+**[Play it in the browser](https://pyrdacor.github.io/Shifty-Bits/)**
+
 A falling-block puzzle written in CShift. Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
 every tile holds a 0 or a 1. You can **roll** a block: A/D rolls all rows left or right, W/S rolls all columns up or
 down. No bit ever leaves the block. When a block touches the floor or a resting tile, it becomes fixed.
@@ -125,6 +127,10 @@ cshiftc build .        # -> bin/ShiftyBits.exe
 cshiftc build web      # -> web/shiftybits.wasm
 node web/serve.mjs     # -> http://localhost:8080/
 ```
+
+Every push to `main` builds the browser version and publishes it on GitHub Pages
+(<https://pyrdacor.github.io/Shifty-Bits/>): [.github/workflows/pages.yml](.github/workflows/pages.yml) downloads the
+CShift release named there, builds `web` and uploads the page, its script and the wasm file.
 
 The wasm backend only exports `_start`, the memory and the function table. The program registers its frame function
 with `web_set_frame` and calls `web_run`, which throws back to JavaScript, so `Main` never returns and nothing is

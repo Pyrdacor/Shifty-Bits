@@ -1,0 +1,60 @@
+# Builds the browser version of Shifty Bits and publishes it on GitHub Pages:
+# https://pyrdacor.github.io/Shifty-Bits/
+name: Publish on GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# a newer run replaces a waiting one, but a deployment that has started is finished
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # the CShift release the game is built with (https://github.com/Robert-Schneckenhaus/CShift/releases)
+  CSHIFT_VERSION: "0.32"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install the CShift compiler
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cshift.tar.xz" \
+            "https://github.com/Robert-Schneckenhaus/CShift/releases/download/v$CSHIFT_VERSION/cshift-$CSHIFT_VERSION-linux-x64.tar.xz"
+          tar -xf "$RUNNER_TEMP/cshift.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cshift-$CSHIFT_VERSION-linux-x64" >> "$GITHUB_PATH"
+
+      - name: Build the browser version
+        run: |
+          cshiftc --version
+          cshiftc build web
+
+      # only what the browser loads: the page, its script and the compiled game
+      - name: Collect the site
+        run: |
+          mkdir _site
+          cp web/index.html web/shiftybits.js web/shiftybits.wasm _site/
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
