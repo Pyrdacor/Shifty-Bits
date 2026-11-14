@@ -13,6 +13,7 @@ extern "C" int web_poll_key();
 extern "C" int web_poll_pointer();
 extern "C" int web_touch();
 extern "C" void web_seed_rect(int x, int y, int w, int h);
+extern "C" void web_state(int state);
 extern "C" int web_audio_rate();
 extern "C" int web_audio_wanted();
 extern "C" void web_audio_write(float* samples, int count);
@@ -108,6 +109,17 @@ unsafe void _Frame(double dt)
         else
             Input.PointerMove(pointer & 0xfff, (pointer >> 12) & 0xfff);
     }
+    // the page shows the touch buttons that fit: 0 menu, 1 playing, 2 paused, 3 game over, 4 help
+    int state = 1;
+    if (_showHelp)
+        state = 4;
+    else if (_state == State.Menu)
+        state = 0;
+    else if (_state == State.GameOver)
+        state = 3;
+    else if (_paused)
+        state = 2;
+    web_state(state);
     // where a tap opens the on-screen keyboard for the seed: only in the menu
     if (_state == State.Menu && !_showHelp)
         web_seed_rect(MenuSeedX, MenuSeedY, MenuSeedW, MenuSeedH);

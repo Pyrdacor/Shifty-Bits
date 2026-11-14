@@ -118,6 +118,42 @@ window.addEventListener('paste', e => {
 });
 window.addEventListener('pointerdown', () => startAudio());
 
+// ---- touch controls ----
+
+// On a phone or tablet the page shows buttons (index.html) that send the keys of the keyboard controls.
+// "?touch=1" in the address shows them on any device, "?touch=0" on none.
+const touchParam = new URLSearchParams(location.search).get('touch');
+const isTouch = touchParam !== null ? touchParam === '1' : window.matchMedia('(pointer: coarse)').matches;
+document.body.classList.toggle('touch', isTouch);
+document.body.dataset.state = 'menu';
+
+const REPEAT_DELAY = 220, REPEAT_EVERY = 55;    // a held button repeats like a held key
+for (const button of document.querySelectorAll('#controls button[data-key]')) {
+  const code = Number(button.dataset.key);
+  let delay = 0, interval = 0;
+  const release = () => {
+    clearTimeout(delay);
+    clearInterval(interval);
+    button.classList.remove('down');
+  };
+  button.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    startAudio();
+    release();
+    button.setPointerCapture(e.pointerId);
+    button.classList.add('down');
+    keys.push(code);
+    if (navigator.vibrate) navigator.vibrate(8);
+    if ('repeat' in button.dataset) {
+      delay = setTimeout(() => { interval = setInterval(() => keys.push(code), REPEAT_EVERY); }, REPEAT_DELAY);
+    }
+  });
+  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
+  button.addEventListener('contextmenu', e => e.preventDefault());
+}
+// fullscreen must be requested inside the event of the tap itself
+document.getElementById('fullscreen').addEventListener('click', () => toggleFullscreen());
+
 // ---- mouse and touch ----
 
 const pointers = [];
@@ -222,7 +258,12 @@ const env = {
   },
   web_poll_key() { return keys.length ? keys.shift() : -1; },
   web_poll_pointer() { return pointers.length ? pointers.shift() : -1; },
-  web_touch() { return window.matchMedia('(pointer: coarse)').matches ? 1 : 0; },
+  web_touch() { return isTouch ? 1 : 0; },
+  // what the game is doing, in the order of the names: the page shows the touch buttons that fit
+  web_state(state) {
+    const name = ['menu', 'play', 'pause', 'over', 'help'][state];
+    if (document.body.dataset.state !== name) document.body.dataset.state = name;
+  },
   web_seed_rect(x, y, w, h) { seedRect = { x, y, w, h }; },
   web_audio_rate() { return AUDIO_RATE; },
   web_audio_wanted() { return audioWanted(); },

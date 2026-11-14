@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shifty Bits</title>
 <style>
   html, body { margin: 0; height: 100%; background: #07081a; overflow: hidden; }
@@ -16,10 +16,90 @@
     border: 1px solid #96784a; padding: 6px 14px; pointer-events: none; transition: opacity 0.6s;
   }
   #hint.hidden { opacity: 0; }
+
+  /* ---- touch controls: only on phones and tablets (body.touch, set by shiftybits.js) ----
+     The buttons send the keys of the keyboard controls. Which of them are shown depends on what the game is doing
+     (body[data-state], also set by the script): menu, play, pause, over or help. */
+  #controls { display: none; }
+  body.touch #controls {
+    display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    /* the size of one button of the cross */
+    --u: min(13vmin, 76px);
+    font: bold calc(var(--u) * 0.42) ui-monospace, Consolas, monospace;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  body.touch #hint { bottom: auto; top: 10px; }
+  #controls button {
+    font: inherit; color: #fff5e1; background: rgba(40, 36, 70, 0.72); border: 2px solid #96784a; border-radius: 10px;
+    padding: 0; margin: 0; touch-action: none; -webkit-tap-highlight-color: transparent; pointer-events: auto;
+  }
+  #controls button.down { background: rgba(190, 135, 45, 0.9); border-color: #ffcd5a; }
+  #controls small { display: block; font-size: 0.5em; color: #aaa0c8; font-weight: normal; }
+  #bar, #pads { display: flex; justify-content: space-between; align-items: flex-end; }
+  #bar { align-items: flex-start; }
+  #bar button { height: calc(var(--u) * 0.8); min-width: calc(var(--u) * 0.9); padding: 0 calc(var(--u) * 0.2); font-size: 0.8em; }
+  #pad-move { display: grid; grid-template-columns: repeat(2, calc(var(--u) * 1.5)); grid-auto-rows: calc(var(--u) * 1.5); gap: 6px; }
+  #pad-roll {
+    display: grid; grid-template-columns: repeat(3, var(--u)); grid-template-rows: repeat(3, var(--u)); gap: 6px;
+    grid-template-areas: ". up ." "left label right" ". down .";
+  }
+  #pad-roll .label { grid-area: label; align-self: center; text-align: center; font-size: 0.5em; color: #aaa0c8; pointer-events: none; }
+  #actions { display: flex; flex-direction: column; gap: 10px; margin: 0 auto; }
+  #actions button { height: calc(var(--u) * 1.1); padding: 0 calc(var(--u) * 0.5); }
+
+  /* what is shown when */
+  #pad-move, #pad-roll, #actions, #actions button { display: none; }
+  #pause { visibility: hidden; }
+  body[data-state="play"] #pad-move, body[data-state="play"] #pad-roll { display: grid; }
+  body[data-state="play"] #pause { visibility: visible; }
+  body[data-state="pause"] #actions, body[data-state="over"] #actions { display: flex; }
+  body[data-state="pause"] #actions .pause, body[data-state="over"] #actions .over { display: block; }
+
+  /* upright: the game at the top, the controls in the space below it */
+  @media (orientation: portrait) {
+    body.touch #stage { flex-direction: column; justify-content: flex-start; }
+    body.touch canvas { height: auto; aspect-ratio: 4 / 3; flex: none; }
+    body.touch #controls { flex: 1; width: 100%; }
+  }
+  /* lying: the controls over the edges of the screen, beside (or over the side panels of) the game */
+  @media (orientation: landscape) {
+    body.touch #controls { position: fixed; inset: 0; pointer-events: none; }
+  }
 </style>
 </head>
 <body>
-<div id="stage"><canvas id="screen" width="960" height="720" tabindex="0"></canvas></div>
+<div id="stage">
+  <canvas id="screen" width="960" height="720" tabindex="0"></canvas>
+  <div id="controls">
+    <div id="bar">
+      <!-- the way to the menu is through PAUSE: a MENU button beside it would end a game by a slip of the thumb -->
+      <button id="pause" data-key="80">PAUSE</button>
+      <button id="fullscreen" aria-label="Fullscreen">&#x26F6;</button>
+    </div>
+    <div id="pads">
+      <div id="pad-move">
+        <button data-key="263" data-repeat aria-label="Move left">&#x25C4;</button>
+        <button data-key="262" data-repeat aria-label="Move right">&#x25BA;</button>
+        <button data-key="264" data-repeat aria-label="Faster">&#x25BC;<small>FASTER</small></button>
+        <button data-key="32" aria-label="Drop">&#x2913;<small>DROP</small></button>
+      </div>
+      <div id="actions">
+        <button class="pause" data-key="80">RESUME</button>
+        <button class="over" data-key="257">NEW GAME</button>
+        <button class="over" data-key="83">SCREENSHOT</button>
+        <button class="pause over" data-key="256">MENU</button>
+      </div>
+      <div id="pad-roll">
+        <button style="grid-area: up" data-key="87" aria-label="Roll columns up">&#x2191;</button>
+        <button style="grid-area: left" data-key="65" aria-label="Roll rows left">&#x2190;</button>
+        <span class="label">ROLL</span>
+        <button style="grid-area: right" data-key="68" aria-label="Roll rows right">&#x2192;</button>
+        <button style="grid-area: down" data-key="83" aria-label="Roll columns down">&#x2193;</button>
+      </div>
+    </div>
+  </div>
+</div>
 <input id="seed" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" autocomplete="off" aria-label="Seed">
 <div id="hint">Press any key or click to start the music</div>
 <script type="module" src="shiftybits.js"></script>

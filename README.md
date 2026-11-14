@@ -22,8 +22,14 @@ The game starts with a menu: Up/Down selects the mode, Left/Right its option, En
 The menu also works with the mouse and, in the browser, with a finger: a click or tap selects a mode, the arrows at
 the right change its option, and PLAY (or a second click on the selected mode) starts it. MUSIC and SOUNDS switch with
 a click, NEW SEED rolls a new random seed. On a phone or tablet a tap on the seed opens the on-screen keyboard to type
-one. The buttons appear as soon as the pointer is used, the key hints come back with the next key. Playing itself
-still needs a keyboard.
+one. The buttons appear as soon as the pointer is used, the key hints come back with the next key.
+
+**Touch controls:** on a phone or tablet the browser version shows buttons that send the keys of the keyboard
+controls: at the left moving (held buttons repeat), FASTER and DROP, at the right a cross that rolls the rows and
+columns, at the top PAUSE and fullscreen. While the game is paused or over, buttons for RESUME, NEW GAME,
+SCREENSHOT and MENU take their place. Held upright, the game is at the top and the buttons below it; lying, the buttons
+are at the edges of the screen. `?touch=1` at the end of the address shows the buttons on any device, `?touch=0` hides
+them.
 
 | Mode | Goal |
 |---|---|
