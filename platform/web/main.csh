@@ -39,6 +39,11 @@ struct Platform
         web_save_best(slot, value);
     }
 
+    /// The browser version only has its built-in songs.
+    static void LoadSongFile(int index)
+    {
+    }
+
     /// Puts `text` on the clipboard.
     static unsafe void CopyText(string text)
     {

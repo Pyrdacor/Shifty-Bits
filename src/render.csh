@@ -534,7 +534,7 @@ struct Render
     }
 
     // an on/off setting of the menu
-    static void _MenuSwitch(int x, int y, int w, string name, bool on, bool selected)
+    static void _MenuSwitch(int x, int y, int w, string name, string state, bool on, bool selected)
     {
         if (selected)
         {
@@ -546,7 +546,6 @@ struct Render
             Gfx.BlendRect(x, y, w, 40, Gfx.Rgb(0, 0, 0), 70);
         }
         Gfx.TextShadow(x + 20, y + 10, name, 3, selected ? Gfx.Rgb(255, 245, 225) : Gfx.Rgb(190, 185, 210));
-        string state = on ? "ON" : "OFF";
         Gfx.TextShadow(x + w - 20 - Gfx.TextWidth(state, 3), y + 10, state, 3, on ? Gfx.Rgb(190, 255, 190) : Gfx.Rgb(255, 130, 120));
     }
 
@@ -605,8 +604,10 @@ struct Render
 
         // music and sounds beside each other
         int half = (w - 48 - 12) / 2;
-        _MenuSwitch(x + 24, y + 390, half, "MUSIC", Music.IsOn(), _menuRow == ModeCount);
-        _MenuSwitch(x + 24 + half + 12, y + 390, half, "SOUNDS", Music.SoundsOn(), _menuRow == ModeCount + 1);
+        // the music switch shows the name of the chosen song, as far as it fits
+        string song = _songName.Length > 11 ? _songName[..11].ToString() : _songName;
+        _MenuSwitch(x + 24, y + 390, half, "MUSIC", Music.IsOn() ? song : "OFF", Music.IsOn(), _menuRow == ModeCount);
+        _MenuSwitch(x + 24 + half + 12, y + 390, half, "SOUNDS", Music.SoundsOn() ? "ON" : "OFF", Music.SoundsOn(), _menuRow == ModeCount + 1);
 
         int sy = y + 446;
         string seed = _seed.ToString();
@@ -619,7 +620,7 @@ struct Render
         Gfx.TextShadow(left, sy + 40, "THE SAME SEED ALWAYS GIVES THE SAME BLOCKS", 2, dim);
 
         Gfx.FillRect(x + 24, y + h - 78, w - 48, 1, Gfx.Rgb(120, 100, 60));
-        Gfx.TextCentered(ScreenW / 2, y + h - 62, _menuRow < ModeCount ? "↑ ↓: MODE   ← →: OPTION   ENTER: PLAY   H: HELP   ESC: QUIT" : "↑ ↓ ← →: SELECT   ENTER: ON / OFF   H: HELP   ESC: QUIT", 2, Gfx.Rgb(170, 230, 255));
+        Gfx.TextCentered(ScreenW / 2, y + h - 62, _menuRow < ModeCount ? "↑ ↓: MODE   ← →: OPTION   ENTER: PLAY   H: HELP   ESC: QUIT" : _menuRow == ModeCount ? "↑ ↓ ← →: SELECT   ENTER: NEXT SONG / OFF   H: HELP   ESC: QUIT" : "↑ ↓ ← →: SELECT   ENTER: ON / OFF   H: HELP   ESC: QUIT", 2, Gfx.Rgb(170, 230, 255));
         Gfx.TextCentered(ScreenW / 2, y + h - 36, "0-9: TYPE A SEED   DEL: RANDOM   CTRL+C: COPY   CTRL+V: PASTE", 2, Gfx.Rgb(170, 230, 255));
     }
 

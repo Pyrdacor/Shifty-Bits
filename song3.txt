@@ -1,0 +1,191 @@
+# Shifty Bits song: edit it with tools/musiceditor. The game embeds this file when it is built.
+# A line of notes is one bar of 16 steps: a note name starts a note, '-' holds it, '.' is silence.
+name OVERCLOCK
+bpm 138
+bars 16
+
+track LEAD
+wave square
+volume 0.075
+attack 0.003
+decay 0.2
+sustain 0.55
+release 0.08
+vibrato 0.002
+sweep 0
+echo 1
+gate 0.8
+transpose 0
+muted 0
+follow 0
+| E5 . E5 G5 - B5 - . E6 - D6 - B5 - G5 -
+| E5 . E5 G5 - C6 - . E6 - D6 - C6 - G5 -
+| D5 . D5 G5 - B5 - . D6 - B5 - G5 - B5 -
+| A5 - F#5 - D5 - F#5 - A5 - - - . . F#5 A5
+| B5 . B5 G5 - E5 - . G5 - B5 - E6 - - -
+| C6 . C6 G5 - E5 - . G5 - C6 - E6 - - -
+| D6 - B5 - G5 - B5 - D6 - G6 - - - D6 -
+| F#6 - - - D6 - - - A5 - - - F#5 - A5 -
+| G5 E5 G5 C6 - . G5 E5 G5 C6 - . E6 - C6 -
+| A5 F#5 A5 D6 - . A5 F#5 A5 D6 - . F#6 - D6 -
+| B5 G5 B5 E6 - . B5 G5 B5 E6 - . G6 - E6 -
+| E6 - D6 - B5 - G5 - E5 - G5 - B5 - - -
+| G5 E5 G5 C6 - . G5 E5 G5 C6 - . E6 - C6 -
+| A5 F#5 A5 D6 - . A5 F#5 A5 D6 - . F#6 - D6 -
+| F#5 D#5 F#5 B5 - . F#5 D#5 F#5 B5 - . D#6 - B5 -
+| B5 - D#6 - F#6 - - - B5 - D#6 - F#6 - . .
+
+track BASS
+wave triangle
+volume 0.28
+attack 0.002
+decay 0.15
+sustain 0.3
+release 0.04
+vibrato 0
+sweep 0
+echo 0
+gate 0.6
+transpose 0
+muted 0
+follow 0
+| E2 - E3 - E2 - E3 - E2 - E3 - E2 - E3 -
+| C2 - C3 - C2 - C3 - C2 - C3 - C2 - C3 -
+| G2 - G3 - G2 - G3 - G2 - G3 - G2 - G3 -
+| D2 - D3 - D2 - D3 - D2 - D3 - D2 - D3 -
+| E2 - E3 - E2 - E3 - E2 - E3 - E2 - E3 -
+| C2 - C3 - C2 - C3 - C2 - C3 - C2 - C3 -
+| G2 - G3 - G2 - G3 - G2 - G3 - G2 - G3 -
+| D2 - D3 - D2 - D3 - D2 - D3 - D2 - D3 -
+| C2 - C3 - C2 - C3 - C2 - C3 - C2 - C3 -
+| D2 - D3 - D2 - D3 - D2 - D3 - D2 - D3 -
+| E2 - E3 - E2 - E3 - E2 - E3 - E2 - E3 -
+| E2 - E3 - E2 - E3 - E2 - E3 - E2 - E3 -
+| C2 - C3 - C2 - C3 - C2 - C3 - C2 - C3 -
+| D2 - D3 - D2 - D3 - D2 - D3 - D2 - D3 -
+| B1 - B2 - B1 - B2 - B1 - B2 - B1 - B2 -
+| B1 - B2 - B1 - B2 - B1 - B2 - B1 - B2 -
+
+track ARP
+wave pulse
+volume 0.035
+attack 0.002
+decay 0.08
+sustain 0
+release 0.04
+vibrato 0
+sweep 0
+echo 1
+gate 0.9
+transpose 0
+muted 0
+follow 0
+| E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5
+| C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5
+| B3 D4 G4 B4 B3 D4 G4 B4 B3 D4 G4 B4 B3 D4 G4 B4
+| D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5
+| E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5
+| C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5
+| B3 D4 G4 B4 B3 D4 G4 B4 B3 D4 G4 B4 B3 D4 G4 B4
+| D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5
+| C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5
+| D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5
+| E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5
+| E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5 E4 G4 B4 E5
+| C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5 C4 E4 G4 C5
+| D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5 D4 F#4 A4 D5
+| B3 D#4 F#4 B4 B3 D#4 F#4 B4 B3 D#4 F#4 B4 B3 D#4 F#4 B4
+| B3 D#4 F#4 B4 B3 D#4 F#4 B4 B3 D#4 F#4 B4 B3 D#4 F#4 B4
+
+track KICK
+wave sine
+volume 0.32
+attack 0.001
+decay 0.12
+sustain 0
+release 0.05
+vibrato 0
+sweep 0.3
+echo 0
+gate 0.9
+transpose 0
+muted 0
+follow 0
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+| C3 . . . C3 . . . C3 . . . C3 . . .
+
+track HIHAT
+wave noise
+volume 0.03
+attack 0.001
+decay 0.03
+sustain 0
+release 0.02
+vibrato 0
+sweep 0
+echo 0
+gate 0.9
+transpose 0
+muted 0
+follow 0
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 . . . E7 . . . E7 . . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+| . . E7 E7 . . E7 . . . E7 E7 . . E7 .
+
+track SNARE
+wave noise
+volume 0.08
+attack 0.001
+decay 0.11
+sustain 0
+release 0.05
+vibrato 0
+sweep 0
+echo 0
+gate 0.9
+transpose 0
+muted 0
+follow 0
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . C4 C4
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . . .
+| . . . . C4 . . . . . . . C4 . C4 C4

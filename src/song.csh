@@ -70,6 +70,8 @@ struct Track
     int[] Notes;
 }
 
+// the name shown in the menu of the game
+string _songName = "SONG";
 int _songBpm = 100;
 int _songBars = 16;
 List<Track> _tracks = List<Track>.Create();
@@ -167,6 +169,7 @@ struct Song
     /// Replaces the song by the one in `lines` (the format of `ToText`). Unknown lines are skipped.
     static void Load(ReadOnlySlice<string> lines)
     {
+        _songName = "SONG";
         _songBpm = 100;
         _songBars = 16;
         _tracks = List<Track>.Create();
@@ -193,6 +196,12 @@ struct Song
                 continue;
             var key = line[..space];
             var value = line[space + 1..].Trim();
+            if (key == "name")
+            {
+                if (last < 0 && value.Length > 0)
+                    _songName = value.ToString();
+                continue;
+            }
             if (key == "track")
             {
                 if (_tracks.Count() < MaxTracks)
@@ -277,6 +286,7 @@ struct Song
         var sb = StringBuilder.Create();
         sb.Append("# Shifty Bits song: edit it with tools/musiceditor. The game embeds this file when it is built.\n");
         sb.Append("# A line of notes is one bar of 16 steps: a note name starts a note, '-' holds it, '.' is silence.\n");
+        sb.Append("name " + _songName + "\n");
         sb.Append("bpm " + _songBpm.ToString() + "\n");
         sb.Append("bars " + _songBars.ToString() + "\n");
         foreach (var t in _tracks)

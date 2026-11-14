@@ -1,5 +1,6 @@
 # Shifty Bits song: edit it with tools/musiceditor. The game embeds this file when it is built.
 # A line of notes is one bar of 16 steps: a note name starts a note, '-' holds it, '.' is silence.
+name NIGHT SKY
 bpm 120
 bars 32
 

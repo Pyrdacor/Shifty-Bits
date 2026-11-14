@@ -16,6 +16,12 @@ struct TestOutput
         Gfx.Init();
         Render.Init();
         Music.Init(AudioRate);
+        if (mode == "music2" || mode == "music3")
+        {
+            // the other built-in songs
+            Music.SelectSong(mode == "music2" ? 1 : 2);
+            return _MusicWav(path);
+        }
         if (mode == "music" || mode == "sounds")
         {
             // "sounds": the same file without the music, to check the sound effects alone

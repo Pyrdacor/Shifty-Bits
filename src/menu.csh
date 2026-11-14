@@ -1,10 +1,11 @@
-//! The main menu: choosing the game mode with its option and entering, copying or pasting the seed.
+//! The main menu: choosing the game mode with its option, the song and the sounds, and entering, copying or pasting
+//! the seed.
 
 namespace ShiftyBits;
 
 using System;
 
-// the row of the menu that switches the music on and off; the rows before it are the modes
+// the row of the menu that chooses the song or switches the music off; the rows before it are the modes
 const int _RowMusic = ModeCount;
 // the row for the sound effects, drawn beside the music row
 const int _RowSounds = ModeCount + 1;
@@ -26,6 +27,7 @@ struct Menu
             int settings = Platform.LoadBest(SettingsSlot);
             Music.SetOn((settings & 1) == 0);
             Music.SetSoundsOn((settings & 2) == 0);
+            _SelectSong((settings >> 2) & 3);
             _settingsLoaded = true;
         }
         _state = State.Menu;
@@ -45,7 +47,34 @@ struct Menu
     /// Keeps the music and sound settings for the next start.
     static void SaveSettings()
     {
-        Platform.SaveBest(SettingsSlot, (Music.IsOn() ? 0 : 1) | (Music.SoundsOn() ? 0 : 2));
+        Platform.SaveBest(SettingsSlot, (Music.IsOn() ? 0 : 1) | (Music.SoundsOn() ? 0 : 2) | (Music.SongIndex() << 2));
+    }
+
+    static void _SelectSong(int index)
+    {
+        Music.SelectSong(Math.Min(index, SongCount - 1));
+        // the desktop game prefers a song file in its folder
+        Platform.LoadSongFile(Music.SongIndex());
+    }
+
+    // the music switch: the songs one after the other, then off
+    static void _NextSong()
+    {
+        if (!Music.IsOn())
+        {
+            Music.SetOn(true);
+            _SelectSong(0);
+        }
+        else if (Music.SongIndex() + 1 < SongCount)
+            _SelectSong(Music.SongIndex() + 1);
+        else
+            Music.SetOn(false);
+        SaveSettings();
+        // the chosen song plays in the menu, to hear what was chosen
+        if (Music.IsOn())
+            Music.Start();
+        else
+            Music.Stop();
     }
 
     /// Handles one key press while the menu is shown.
@@ -76,10 +105,7 @@ struct Menu
         else if (k == KeyEnter || k == KeyPadEnter || k == ' ')
         {
             if (_menuRow == _RowMusic)
-            {
-                Music.Toggle();
-                SaveSettings();
-            }
+                _NextSong();
             else if (_menuRow == _RowSounds)
             {
                 Music.SetSoundsOn(!Music.SoundsOn());

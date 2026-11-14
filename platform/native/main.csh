@@ -7,7 +7,6 @@ using System;
 using Mfb from "MiniFB.h";
 
 const string _BestFile = "shiftybits-best.txt";
-const string _SongFile = "song.txt";
 
 const uint32 _CfText = 1;
 const uint32 _GmemMoveable = 2;
@@ -64,6 +63,24 @@ struct Platform
             }
         }
         return bests;
+    }
+
+    /// A song file beside the game (`SongFiles`) replaces the built-in song of that number, so that music from the
+    /// editor can be tried without building.
+    static void LoadSongFile(int index)
+    {
+        string path = SongFiles[index];
+        if (!File.Exists(path))
+            return;
+        if (File.ReadAllText(path) is string text)
+        {
+            var lines = List<string>.Create();
+            foreach (var line in text.Split('\n'))
+            {
+                lines.Add(line.ToString());
+            }
+            Music.LoadSong(lines.ToArray());
+        }
     }
 
     /// Puts `text` on the clipboard.
@@ -157,22 +174,6 @@ Mfb.mfb_window* _OpenWindow()
     return window;
 }
 
-// a song.txt beside the game replaces the built-in song, so that music from the editor can be tried without building
-void _LoadSongFile()
-{
-    if (!File.Exists(_SongFile))
-        return;
-    if (File.ReadAllText(_SongFile) is string text)
-    {
-        var lines = List<string>.Create();
-        foreach (var line in text.Split('\n'))
-        {
-            lines.Add(line.ToString());
-        }
-        Music.LoadSong(lines.ToArray());
-    }
-}
-
 // ---- main loop ----
 
 int Main(string[] args)
@@ -184,7 +185,6 @@ int Main(string[] args)
     Gfx.Init();
     Render.Init();
     Music.Init(AudioRate);
-    _LoadSongFile();
     Audio.Init();
     Menu.Open();
     Mfb.mfb_set_target_fps(60);

@@ -783,13 +783,15 @@ struct Editor
             failed += 1;
 
         int tracks = _tracks.Count();
+        // what the second track follows must survive adding and deleting a track behind it
+        int follow = _tracks.Count() > 1 ? _tracks[1].Follow : -1;
         _AddTrack(false);
         _ChangeParam(1, 10);
         if (!_Check("a new track is added and its volume changes", _tracks.Count() == tracks + 1 && _tracks[_sel].Sound.Volume == 0.2))
             failed += 1;
         _DeleteTrack();
         _SelectTrack(1);
-        if (!_Check("a track that follows another one keeps doing so", _tracks.Count() == tracks && _tracks[1].Follow == 0))
+        if (!_Check("adding and deleting a track leaves the other tracks as they are", _tracks.Count() == tracks && (tracks < 2 || _tracks[1].Follow == follow)))
             failed += 1;
         Song.SetBars(_songBars + 2);
         _SongChanged();

@@ -34,22 +34,25 @@ back), Ctrl+V pastes one and Ctrl+C copies it. An entered seed stays for every f
 the game and on the final screen, where Ctrl+C copies it as well.
 
 **Music and sound** come from a small synthesizer written in CShift ([src/music.csh](src/music.csh)): it plays the
-song of [song.txt](song.txt) in a loop (a little faster on higher levels), plus
+chosen song in a loop (a little faster on higher levels), plus
 sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
-sound effects are switched on and off separately in the menu (the line below the modes); **M** switches the music
-at any time. Both settings are remembered.
+sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the three
+songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt))
+and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
+music off and on at any time. The settings are remembered.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
 
 ## Music editor
 
-`tools/musiceditor` is a small editor for [song.txt](song.txt). It uses the synthesizer and the sound output of the
+`tools/musiceditor` is a small editor for the song files (`song.txt`, `song2.txt`, `song3.txt`). It uses the synthesizer and the sound output of the
 game, so a song sounds in the editor as it does in the game.
 
 ```sh
 cshiftc build tools/musiceditor            # -> tools/musiceditor/bin/MusicEditor.exe
 tools/musiceditor/bin/MusicEditor.exe      # edits song.txt of the current folder (or of a folder above)
+tools/musiceditor/bin/MusicEditor.exe song2.txt
 ```
 
 A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform,
@@ -71,9 +74,10 @@ octave above the lead).
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+S | Save |
 
-The game embeds `song.txt` when it is built. The desktop game also reads a `song.txt` from the folder it is started
-in, so a saved song can be heard in the game at its next start without building; the browser version needs a new
-build. `MusicEditor.exe --selftest` checks the editing functions without a window.
+The game embeds the three song files when it is built. The desktop game also reads a song file of the same name from
+the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
+version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
+the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
 
 ## Controls
 
@@ -102,7 +106,7 @@ Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font
 
 ```
 src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
-song.txt           the music, embedded by the game and edited with tools/musiceditor
+song*.txt          the three songs, embedded by the game and edited with tools/musiceditor
 platform/native/   desktop: MiniFB window, winmm sound (audio.csh), files; testing.csh writes test images and music
 tools/musiceditor/ the music editor (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
 platform/web/      browser: imports from web/shiftybits.js
@@ -130,5 +134,5 @@ with the first key press or click (browsers only allow sound after one). In the 
 
 `ShiftyBits.exe --shot image.png [play|over|help|menu|countdown|score|nonzero]` plays a few automatic moves and renders
 one image;
-`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `sounds` instead of `music` only the sound
-effects (all for testing).
+`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2` and `music3` the other songs, `sounds` only the
+sound effects (all for testing).
