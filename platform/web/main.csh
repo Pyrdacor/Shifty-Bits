@@ -10,6 +10,9 @@ extern "C" void web_set_frame(Action<double> frame);
 extern "C" void web_run();
 extern "C" void web_present(uint32* pixels, int count);
 extern "C" int web_poll_key();
+extern "C" int web_poll_pointer();
+extern "C" int web_touch();
+extern "C" void web_seed_rect(int x, int y, int w, int h);
 extern "C" int web_audio_rate();
 extern "C" int web_audio_wanted();
 extern "C" void web_audio_write(float* samples, int count);
@@ -42,6 +45,12 @@ struct Platform
     /// The browser version only has its built-in songs.
     static void LoadSongFile(int index)
     {
+    }
+
+    /// Whether the browser runs on a phone or tablet (its main pointer is a finger).
+    static bool IsTouch()
+    {
+        return web_touch() != 0;
     }
 
     /// Puts `text` on the clipboard.
@@ -88,6 +97,22 @@ unsafe void _Frame(double dt)
             break;
         Input.Key(key & 0xffff, key >> 16);
     }
+    while (true)
+    {
+        // x in the low 12 bits, then y, then 1 for a click or tap and 0 for a move
+        int pointer = web_poll_pointer();
+        if (pointer < 0)
+            break;
+        if ((pointer >> 24) != 0)
+            Input.Pointer(pointer & 0xfff, (pointer >> 12) & 0xfff);
+        else
+            Input.PointerMove(pointer & 0xfff, (pointer >> 12) & 0xfff);
+    }
+    // where a tap opens the on-screen keyboard for the seed: only in the menu
+    if (_state == State.Menu && !_showHelp)
+        web_seed_rect(MenuSeedX, MenuSeedY, MenuSeedW, MenuSeedH);
+    else
+        web_seed_rect(0, 0, 0, 0);
     Game.Update(Math.Min(0.1, dt));
     Render.Frame();
     int wanted = web_audio_wanted();

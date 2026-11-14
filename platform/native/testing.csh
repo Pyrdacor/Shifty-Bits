@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|countdown|score|nonzero|music]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|music]`).
 
 namespace ShiftyBits;
 
@@ -32,6 +32,18 @@ struct TestOutput
         _seed = 12345;
         _countdownChoice = 0;
         _scoreChoice = 0;
+        bool menu = mode == "menu" || mode == "pointer";
+        if (mode == "pointer")
+        {
+            // the menu used with the mouse: the next countdown option, the score mode, its option before the first
+            // one (the last), then the mouse over the PLAY button
+            int rowY = MenuRowY + 20;
+            Input.Pointer(MenuRowX + MenuRowW - 40, rowY + MenuRowPitch);
+            Input.Pointer(MenuRowX + 100, rowY + 2 * MenuRowPitch);
+            Input.Pointer(MenuRowX + MenuRowW - MenuOptionW + 10, rowY + 2 * MenuRowPitch);
+            Input.PointerMove(MenuPlayX + 10, MenuButtonY + 10);
+            Console.WriteLine("countdown option " + _countdownChoice.ToString() + ", score option " + _scoreChoice.ToString() + ", row " + _menuRow.ToString());
+        }
         bool toEnd = mode == "over";
         if (mode == "countdown" || mode == "score" || mode == "nonzero")
         {
@@ -39,10 +51,10 @@ struct TestOutput
             _menuRow = (int)_mode;
             toEnd = true;
         }
-        if (mode != "menu")
+        if (!menu)
             Game.NewGame();
         _showHelp = mode == "help";
-        if (mode != "help" && mode != "menu")
+        if (mode != "help" && !menu)
         {
             int drops = toEnd ? 4000 : 30;
             for (var i = 0; i < drops && _state != State.GameOver; i += 1)
@@ -67,6 +79,12 @@ struct TestOutput
         Console.WriteLine(Game.ModeText() + ": score " + _score.ToString() + ", time " + Game.TimeText(_playTime, true));
         Render.Frame();
         _capturing = false;
+        if (mode == "pointer")
+        {
+            // after the image: PLAY must start the selected mode
+            Input.Pointer(MenuPlayX + 10, MenuButtonY + 10);
+            Console.WriteLine("after PLAY: " + (_state == State.Playing ? "playing " : "not playing ") + Game.ModeText());
+        }
         if (File.WriteAllBytes(path, Screenshot.Encode()) is error e)
             return 1;
         return 0;

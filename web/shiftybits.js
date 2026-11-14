@@ -11,6 +11,7 @@ const ctx2d = canvas.getContext('2d');
 const image = ctx2d.createImageData(W, H);
 const image32 = new Uint32Array(image.data.buffer);
 const hint = document.getElementById('hint');
+const seedInput = document.getElementById('seed');
 
 let memory = null;
 const decoder = new TextDecoder();
@@ -85,6 +86,11 @@ function toggleFullscreen() {
 
 window.addEventListener('keydown', e => {
   startAudio();
+  // typing into the seed field of the on-screen keyboard arrives through its input event (below)
+  if (e.target === seedInput) {
+    if (e.key === 'Enter') seedInput.blur();
+    return;
+  }
   // fullscreen must be requested inside the key event itself
   if (e.code === 'F11' || (e.code === 'Enter' && e.altKey)) {
     e.preventDefault();
@@ -111,6 +117,51 @@ window.addEventListener('paste', e => {
   keys.push(86 | (2 << 16));
 });
 window.addEventListener('pointerdown', () => startAudio());
+
+// ---- mouse and touch ----
+
+const pointers = [];
+let seedRect = { x: 0, y: 0, w: 0, h: 0 };    // set by the game (web_seed_rect), in pixels of its screen
+
+// the position of a pointer event in pixels of the game's screen, which is scaled to fit the canvas and centered
+function toScreen(e) {
+  const r = canvas.getBoundingClientRect();
+  const scale = Math.min(r.width / W, r.height / H);
+  const x = Math.floor((e.clientX - r.left - (r.width - W * scale) / 2) / scale);
+  const y = Math.floor((e.clientY - r.top - (r.height - H * scale) / 2) / scale);
+  return x >= 0 && y >= 0 && x < W && y < H ? { x, y } : null;
+}
+
+canvas.addEventListener('pointerdown', e => {
+  const p = toScreen(e);
+  if (p) pointers.push(p.x | (p.y << 12) | (1 << 24));
+});
+canvas.addEventListener('pointermove', e => {
+  const p = toScreen(e);
+  if (!p) return;
+  // only the latest position matters
+  if (pointers.length && pointers[pointers.length - 1] >> 24 === 0) pointers.pop();
+  pointers.push(p.x | (p.y << 12));
+});
+
+// A tap on the seed shows the on-screen keyboard: for that an (invisible) input field must get the focus inside the
+// event of the tap itself. With a mouse there is a real keyboard, and the field would only swallow its keys.
+canvas.addEventListener('click', e => {
+  const p = toScreen(e);
+  const onSeed = p && p.x >= seedRect.x && p.x < seedRect.x + seedRect.w && p.y >= seedRect.y && p.y < seedRect.y + seedRect.h;
+  if (onSeed && e.pointerType !== 'mouse') {
+    seedInput.value = '';
+    seedInput.focus();
+  } else {
+    seedInput.blur();
+  }
+});
+// every change sends the whole text: the game takes it as the seed (an empty text brings the random seed back)
+seedInput.addEventListener('input', () => {
+  seedInput.value = seedInput.value.replace(/[^0-9]/g, '').slice(0, 9);
+  pasted = seedInput.value;
+  keys.push(1000);
+});
 
 // ---- WASI (only what the program uses: console output, the clock, no files) ----
 
@@ -170,6 +221,9 @@ const env = {
     ctx2d.putImageData(image, 0, 0);
   },
   web_poll_key() { return keys.length ? keys.shift() : -1; },
+  web_poll_pointer() { return pointers.length ? pointers.shift() : -1; },
+  web_touch() { return window.matchMedia('(pointer: coarse)').matches ? 1 : 0; },
+  web_seed_rect(x, y, w, h) { seedRect = { x, y, w, h }; },
   web_audio_rate() { return AUDIO_RATE; },
   web_audio_wanted() { return audioWanted(); },
   web_audio_write(ptr, count) {

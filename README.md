@@ -19,6 +19,12 @@ faster and get bigger (at most 3 tiles at first, up to 4x4 from level 8).
 
 The game starts with a menu: Up/Down selects the mode, Left/Right its option, Enter starts.
 
+The menu also works with the mouse and, in the browser, with a finger: a click or tap selects a mode, the arrows at
+the right change its option, and PLAY (or a second click on the selected mode) starts it. MUSIC and SOUNDS switch with
+a click, NEW SEED rolls a new random seed. On a phone or tablet a tap on the seed opens the on-screen keyboard to type
+one. The buttons appear as soon as the pointer is used, the key hints come back with the next key. Playing itself
+still needs a keyboard.
+
 | Mode | Goal |
 |---|---|
 | Normal | Play until the well is full. |
@@ -138,7 +144,7 @@ released. JavaScript then calls the frame function through the function table on
 with the first key press or click (browsers only allow sound after one). In the browser the best values are kept in
 `localStorage` and a screenshot is downloaded.
 
-`ShiftyBits.exe --shot image.png [play|over|help|menu|countdown|score|nonzero]` plays a few automatic moves and renders
+`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero]` plays a few automatic moves and renders
 one image;
 `ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2` and `music3` the other songs, `sounds` only the
 sound effects (all for testing).

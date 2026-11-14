@@ -19,6 +19,8 @@ const int KeyF12 = 301;
 /// The 0 of the number pad; the other digits follow.
 const int KeyPad0 = 320;
 const int KeyPadEnter = 335;
+/// Not a key: the platform has new text for the seed (`Platform.PasteText`), typed on an on-screen keyboard.
+const int KeySeedInput = 1000;
 /// Modifier bit for Ctrl.
 const int ModCtrl = 2;
 /// Modifier bit for Alt.
@@ -99,6 +101,21 @@ struct Input
             Game.Restart();
         else if (k == 'H' || k == KeyF1)
             _showHelp = true;
+    }
+
+    /// Handles a click or tap at a pixel of the screen.
+    static void Pointer(int x, int y)
+    {
+        if (_showHelp)
+            _showHelp = false;
+        else if (_state == State.Menu)
+            Menu.Pointer(x, y);
+    }
+
+    /// Handles the mouse moving to a pixel of the screen.
+    static void PointerMove(int x, int y)
+    {
+        Menu.Hover(x, y);
     }
 
     /// Renders the screen without prompts, encodes it as PNG and hands it to the platform to store.

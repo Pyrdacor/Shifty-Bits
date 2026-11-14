@@ -83,6 +83,12 @@ struct Platform
         }
     }
 
+    /// Whether the game runs on a phone or tablet (never on the desktop).
+    static bool IsTouch()
+    {
+        return false;
+    }
+
     /// Puts `text` on the clipboard.
     static unsafe void CopyText(string text)
     {
@@ -155,6 +161,33 @@ void OnKey(Mfb.mfb_window* window, Mfb.mfb_key key, Mfb.mfb_key_mod mod, bool pr
         Input.Key((int)key, (int)mod);
 }
 
+// a pixel of the window as a pixel of the screen: the image is scaled to fit the window and centered in it
+unsafe void _ToScreen(Mfb.mfb_window* window, int x, int y, bool click)
+{
+    double w = (double)Mfb.mfb_get_window_width(window);
+    double h = (double)Mfb.mfb_get_window_height(window);
+    if (w <= 0.0 || h <= 0.0)
+        return;
+    double scale = Math.Min(w / ScreenW, h / ScreenH);
+    int sx = (int)((x - (w - ScreenW * scale) / 2.0) / scale);
+    int sy = (int)((y - (h - ScreenH * scale) / 2.0) / scale);
+    if (click)
+        Input.Pointer(sx, sy);
+    else
+        Input.PointerMove(sx, sy);
+}
+
+void OnMouseButton(Mfb.mfb_window* window, Mfb.mfb_mouse_button button, Mfb.mfb_key_mod mod, bool pressed)
+{
+    if (pressed && (int)button == 1)
+        _ToScreen(window, Mfb.mfb_get_mouse_x(window), Mfb.mfb_get_mouse_y(window), true);
+}
+
+void OnMouseMove(Mfb.mfb_window* window, int x, int y)
+{
+    _ToScreen(window, x, y, false);
+}
+
 bool OnClose(Mfb.mfb_window* window)
 {
     return true;
@@ -168,6 +201,8 @@ Mfb.mfb_window* _OpenWindow()
     if (window == null)
         return window;
     Mfb.mfb_set_keyboard_callback(window, OnKey);
+    Mfb.mfb_set_mouse_button_callback(window, OnMouseButton);
+    Mfb.mfb_set_mouse_move_callback(window, OnMouseMove);
     Mfb.mfb_set_close_callback(window, OnClose);
     if (_fullscreen)
         Mfb.mfb_set_viewport_best_fit(window, (uint32)ScreenW, (uint32)ScreenH);
