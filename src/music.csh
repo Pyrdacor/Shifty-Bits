@@ -18,14 +18,15 @@ enum Sfx : uint8
 const int _VoiceCount = 32;
 
 /// The number of songs built into the program.
-const int SongCount = 3;
+const int SongCount = 4;
 /// The files of the built-in songs. The editor works on such a file, and the desktop game prefers a file of this name
 /// in its folder to the built-in song.
-const ReadOnlySlice<string> SongFiles = ["song.txt", "song2.txt", "song3.txt"];
+const ReadOnlySlice<string> SongFiles = ["song.txt", "song2.txt", "song3.txt", "song4.txt"];
 
 const ReadOnlySlice<string> _SongLines = embed_lines("../song.txt");
 const ReadOnlySlice<string> _Song2Lines = embed_lines("../song2.txt");
 const ReadOnlySlice<string> _Song3Lines = embed_lines("../song3.txt");
+const ReadOnlySlice<string> _Song4Lines = embed_lines("../song4.txt");
 
 // ---- instruments of the sound effects ----
 
@@ -46,6 +47,11 @@ struct _Voice
     double Freq;
     double Sweep;       // the frequency is multiplied by this every sample
     double Phase;
+    double Phase2;      // the two oscillators of a detuned instrument
+    double Phase3;
+    double Filter1;     // the two stages of the low-pass filter
+    double Filter2;
+    double FilterEnv;   // 1 at the start of the note, falls with the decay: how far the filter is still open
     double Env;
     int Stage;          // 0 attack, 1 decay/sustain, 2 release
     double AttackStep;
@@ -110,7 +116,7 @@ struct Music
     static void SelectSong(int index)
     {
         _songIndex = Math.Clamp(index, 0, SongCount - 1);
-        LoadSong(_songIndex == 1 ? _Song2Lines : _songIndex == 2 ? _Song3Lines : _SongLines);
+        LoadSong(_songIndex == 1 ? _Song2Lines : _songIndex == 2 ? _Song3Lines : _songIndex == 3 ? _Song4Lines : _SongLines);
     }
 
     /// The number of the song chosen with `SelectSong`.
@@ -446,7 +452,32 @@ struct Music
             DecayMul = Math.Exp(-1.0 / samples),
             ReleaseMul = Math.Exp(-1.0 / Math.Max(1.0, sound.Release * _rate)),
             Gate = Math.Max(1, gate),
+            // apart from each other, so that the three oscillators do not start as one
+            Phase2 = 0.33, Phase3 = 0.67,
+            FilterEnv = 1.0,
         };
+    }
+
+    // one oscillator: the waveform at the phase `p` (0 to 1)
+    static double _Wave(Wave wave, double p)
+    {
+        switch (wave)
+        {
+            case Wave.Sine:
+                return _sineTable[(int)(p * 1024.0) & 1023];
+            case Wave.Triangle:
+                return 4.0 * Math.Abs(p - 0.5) - 1.0;
+            case Wave.Pulse:
+                return p < 0.25 ? 0.8 : -0.8;
+            case Wave.Square:
+                return p < 0.5 ? 0.6 : -0.6;
+            case Wave.Noise:
+                _noise = unchecked(_noise * 1664525u + 1013904223u);
+                return (double)(int)(_noise >> 16) / 32768.0 - 1.0;
+            case Wave.Saw:
+                return (2.0 * p - 1.0) * 0.7;
+        }
+        return 0.0;
     }
 
     static double _Sample(int v)
@@ -465,26 +496,30 @@ struct Music
             voice.Phase -= Math.Floor(voice.Phase);
         voice.Freq *= voice.Sweep;
 
-        double p = voice.Phase;
-        double s = 0.0;
-        switch (voice.Sound.Wave)
+        double s = _Wave(voice.Sound.Wave, voice.Phase);
+        double detune = voice.Sound.Detune;
+        if (detune > 0.0)
         {
-            case Wave.Sine:
-                s = _sineTable[(int)(p * 1024.0) & 1023];
-                break;
-            case Wave.Triangle:
-                s = 4.0 * Math.Abs(p - 0.5) - 1.0;
-                break;
-            case Wave.Pulse:
-                s = p < 0.25 ? 0.8 : -0.8;
-                break;
-            case Wave.Square:
-                s = p < 0.5 ? 0.6 : -0.6;
-                break;
-            case Wave.Noise:
-                _noise = unchecked(_noise * 1664525u + 1013904223u);
-                s = (double)(int)(_noise >> 16) / 32768.0 - 1.0;
-                break;
+            // two more oscillators a little below and above the note
+            voice.Phase2 += freq * (1.0 - detune) / _rate;
+            if (voice.Phase2 >= 1.0)
+                voice.Phase2 -= Math.Floor(voice.Phase2);
+            voice.Phase3 += freq * (1.0 + detune) / _rate;
+            if (voice.Phase3 >= 1.0)
+                voice.Phase3 -= Math.Floor(voice.Phase3);
+            s = (s + _Wave(voice.Sound.Wave, voice.Phase2) + _Wave(voice.Sound.Wave, voice.Phase3)) * 0.45;
+        }
+
+        // the low-pass filter: two simple stages in a row (12 dB per octave), opened wider at the start of the note
+        double cutoff = voice.Sound.Cutoff;
+        if (cutoff > 0.0)
+        {
+            double g = 6.2832 * cutoff * (1.0 + voice.Sound.Pluck * voice.FilterEnv) / _rate;
+            double k = g / (1.0 + g);
+            voice.FilterEnv *= voice.DecayMul;
+            voice.Filter1 += (s - voice.Filter1) * k;
+            voice.Filter2 += (voice.Filter1 - voice.Filter2) * k;
+            s = voice.Filter2;
         }
 
         // envelope

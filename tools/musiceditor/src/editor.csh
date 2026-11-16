@@ -30,7 +30,7 @@ const int _TrackY = 52;
 const int _TrackRowH = 24;
 const int _TrackButtonsY = 346;
 const int _ParamY = 384;
-const int _ParamRowH = 24;
+const int _ParamRowH = 19;
 const int _KeysX = 228;
 const int _GridX = 272;
 const int _StepW = 21;
@@ -52,8 +52,9 @@ const double _StatusSeconds = 5.0;
 
 const ReadOnlySlice<string> _ParamNames = [
     "WAVE", "VOLUME", "ATTACK", "DECAY", "SUSTAIN", "RELEASE", "VIBRATO", "SWEEP", "ECHO", "GATE", "FOLLOW", "TRANSP.",
+    "DETUNE", "CUTOFF", "PLUCK",
 ];
-const ReadOnlySlice<string> _WaveLabels = ["SINE", "TRI", "PULSE", "SQUARE", "NOISE"];
+const ReadOnlySlice<string> _WaveLabels = ["SINE", "TRI", "PULSE", "SQUARE", "NOISE", "SAW"];
 // one color per track, for its notes
 const ReadOnlySlice<uint32> _TrackColors = [
     0x5ac8ffu, 0xffb45au, 0x8ce678u, 0xff7896u, 0xc8a0ffu, 0xffe66eu,
@@ -504,6 +505,12 @@ struct Editor
                 return t.Follow >= 0 ? "TRK " + (t.Follow + 1).ToString() : "-";
             case 11:
                 return (t.Transpose > 0 ? "+" : "") + t.Transpose.ToString();
+            case 12:
+                return Song.Number(t.Sound.Detune);
+            case 13:
+                return t.Sound.Cutoff > 0.0 ? Song.Number(t.Sound.Cutoff) : "OFF";
+            case 14:
+                return Song.Number(t.Sound.Pluck);
         }
         return "";
     }
@@ -552,6 +559,15 @@ struct Editor
             case 11:
                 // Shift moves by an octave
                 t.Transpose = Math.Clamp(t.Transpose + (delta == one ? one : one * 12), -36, 36);
+                break;
+            case 12:
+                t.Sound.Detune = _Step(t.Sound.Detune, delta, 0.001, 0.0, 0.03);
+                break;
+            case 13:
+                t.Sound.Cutoff = _Step(t.Sound.Cutoff, delta, 50.0, 0.0, 8000.0);
+                break;
+            case 14:
+                t.Sound.Pluck = _Step(t.Sound.Pluck, delta, 0.5, 0.0, 16.0);
                 break;
         }
         _tracks[_sel] = t;
@@ -744,9 +760,11 @@ struct Editor
         _viewBar = 0;
         int a = _topNote - 5;
         var old = _Copy(_tracks[0].Notes);
+        // the step behind the new note stays, unless it held a note that the new one cut off
+        int after = old[24] == NoteHold ? NoteOff : old[24];
         _TestDrag(1, 20, 23, a);
         var n = _tracks[0].Notes;
-        if (!_Check("dragging places a note of 4 steps", n[20] == a && n[21] == NoteHold && n[22] == NoteHold && n[23] == NoteHold && n[24] == old[24]))
+        if (!_Check("dragging places a note of 4 steps", n[20] == a && n[21] == NoteHold && n[22] == NoteHold && n[23] == NoteHold && n[24] == after))
             failed += 1;
         _TestDrag(2, 22, 22, a);
         n = _tracks[0].Notes;
@@ -786,13 +804,22 @@ struct Editor
         // what the second track follows must survive adding and deleting a track behind it
         int follow = _tracks.Count() > 1 ? _tracks[1].Follow : -1;
         _AddTrack(false);
-        _ChangeParam(1, 10);
-        if (!_Check("a new track is added and its volume changes", _tracks.Count() == tracks + 1 && _tracks[_sel].Sound.Volume == 0.2))
-            failed += 1;
-        _DeleteTrack();
-        _SelectTrack(1);
-        if (!_Check("adding and deleting a track leaves the other tracks as they are", _tracks.Count() == tracks && (tracks < 2 || _tracks[1].Follow == follow)))
-            failed += 1;
+        if (tracks >= MaxTracks)
+        {
+            // a song that is full has no room for the track this test adds and deletes again
+            if (!_Check("a full song refuses another track", _tracks.Count() == tracks))
+                failed += 1;
+        }
+        else
+        {
+            _ChangeParam(1, 10);
+            if (!_Check("a new track is added and its volume changes", _tracks.Count() == tracks + 1 && _tracks[_sel].Sound.Volume == 0.2))
+                failed += 1;
+            _DeleteTrack();
+            _SelectTrack(1);
+            if (!_Check("adding and deleting a track leaves the other tracks as they are", _tracks.Count() == tracks && (tracks < 2 || _tracks[1].Follow == follow)))
+                failed += 1;
+        }
         Song.SetBars(_songBars + 2);
         _SongChanged();
         if (!_Check("more bars make every track longer", _tracks[0].Notes.Length == Song.Steps()))
@@ -934,12 +961,12 @@ struct Editor
             bool hover = _In(4, y - 2, _LeftW, _ParamRowH);
             if (hover)
                 Gfx.FillRect(4, y - 2, _LeftW, _ParamRowH, Gfx.Rgb(36, 34, 56));
-            Gfx.Text(8, y + 3, _ParamNames[p], 2, Gfx.Rgb(170, 160, 200));
-            Gfx.Text(98, y + 3, _ParamText(track, p), 2, Gfx.Rgb(235, 232, 245));
+            Gfx.Text(8, y + 1, _ParamNames[p], 2, Gfx.Rgb(170, 160, 200));
+            Gfx.Text(98, y + 1, _ParamText(track, p), 2, Gfx.Rgb(235, 232, 245));
             int delta = 0;
-            if (_Button(178, y, 20, 20, "-", false))
+            if (_Button(178, y - 1, 20, 17, "-", false))
                 delta = -step;
-            if (_Button(200, y, 20, 20, "+", false))
+            if (_Button(200, y - 1, 20, 17, "+", false))
                 delta = step;
             if (hover && _wheel != 0)
                 delta = _wheel * step;

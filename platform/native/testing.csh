@@ -16,10 +16,10 @@ struct TestOutput
         Gfx.Init();
         Render.Init();
         Music.Init(AudioRate);
-        if (mode == "music2" || mode == "music3")
+        if (mode == "music2" || mode == "music3" || mode == "music4")
         {
             // the other built-in songs
-            Music.SelectSong(mode == "music2" ? 1 : 2);
+            Music.SelectSong(mode == "music2" ? 1 : mode == "music3" ? 2 : 3);
             return _MusicWav(path);
         }
         if (mode == "music" || mode == "sounds")

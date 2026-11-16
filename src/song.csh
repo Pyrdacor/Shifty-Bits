@@ -28,10 +28,12 @@ enum Wave : uint8
     Pulse,
     Square,
     Noise,
+    /// A sawtooth: the bright, buzzing sound of classic synthesizers.
+    Saw,
 }
 
 /// The names of the waveforms in the song file, in the order of `Wave`.
-const ReadOnlySlice<string> WaveNames = ["sine", "triangle", "pulse", "square", "noise"];
+const ReadOnlySlice<string> WaveNames = ["sine", "triangle", "pulse", "square", "noise", "saw"];
 const ReadOnlySlice<string> _NoteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 /// How a note sounds: waveform, volume and envelope (times in seconds).
@@ -48,6 +50,15 @@ struct Instrument
     double Vibrato;
     /// The pitch falls to this factor during the decay (drums); 0 for none.
     double SweepTo;
+    /// Two more oscillators play this fraction below and above the note (0.007 is about 12 cents): the wide,
+    /// shimmering sound of trance leads and pads. 0 for none.
+    double Detune;
+    /// A low-pass filter: frequencies above this (in Hz) are damped, which makes a sawtooth or square soft and warm.
+    /// 0 for no filter.
+    double Cutoff;
+    /// How many times higher than `Cutoff` the filter starts at the beginning of a note; it closes with the decay.
+    /// That is the sound of a plucked synthesizer note. 0 for a filter that does not move.
+    double Pluck;
     /// Sent to the echo.
     bool Echo;
     /// A sound effect: not affected by the music volume.
@@ -241,6 +252,12 @@ struct Song
                 t.Sound.Vibrato = number;
             else if (key == "sweep")
                 t.Sound.SweepTo = number;
+            else if (key == "detune")
+                t.Sound.Detune = number;
+            else if (key == "cutoff")
+                t.Sound.Cutoff = number;
+            else if (key == "pluck")
+                t.Sound.Pluck = number;
             else if (key == "echo")
                 t.Sound.Echo = number != 0.0;
             else if (key == "gate")
@@ -300,6 +317,9 @@ struct Song
             sb.Append("release " + Number(t.Sound.Release) + "\n");
             sb.Append("vibrato " + Number(t.Sound.Vibrato) + "\n");
             sb.Append("sweep " + Number(t.Sound.SweepTo) + "\n");
+            sb.Append("detune " + Number(t.Sound.Detune) + "\n");
+            sb.Append("cutoff " + Number(t.Sound.Cutoff) + "\n");
+            sb.Append("pluck " + Number(t.Sound.Pluck) + "\n");
             sb.Append("echo " + (t.Sound.Echo ? "1" : "0") + "\n");
             sb.Append("gate " + Number(t.Gate) + "\n");
             sb.Append("transpose " + t.Transpose.ToString() + "\n");

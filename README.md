@@ -50,9 +50,9 @@ the game and on the final screen, where Ctrl+C copies it as well.
 **Music and sound** come from a small synthesizer written in CShift ([src/music.csh](src/music.csh)): it plays the
 chosen song in a loop (a little faster on higher levels), plus
 sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
-sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the three
-songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt))
-and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
+sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the four
+songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
+AFTERGLOW in [song4.txt](song4.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
@@ -60,7 +60,7 @@ After a game, **S** (or F12) saves a screenshot of the final screen, with the da
 
 ## Music editor
 
-`tools/musiceditor` is a small editor for the song files (`song.txt`, `song2.txt`, `song3.txt`). It uses the synthesizer and the sound output of the
+`tools/musiceditor` is a small editor for the song files (`song.txt`, `song2.txt`, `song3.txt`, `song4.txt`). It uses the synthesizer and the sound output of the
 game, so a song sounds in the editor as it does in the game.
 
 ```sh
@@ -69,8 +69,9 @@ tools/musiceditor/bin/MusicEditor.exe      # edits song.txt of the current folde
 tools/musiceditor/bin/MusicEditor.exe song2.txt
 ```
 
-A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform,
-volume, attack, decay, sustain, release, vibrato, pitch sweep, echo) and plays one note at a time; a track can also
+A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform: sine, triangle, pulse, square, noise or sawtooth;
+volume, attack, decay, sustain, release, vibrato, pitch sweep, detune, a low-pass filter that can open with every
+note (cutoff and pluck), echo) and plays one note at a time; a track can also
 *follow* another one, which plays that track's notes with a second instrument (the song uses it for a quiet sine an
 octave above the lead).
 
@@ -88,7 +89,7 @@ octave above the lead).
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+S | Save |
 
-The game embeds the three song files when it is built. The desktop game also reads a song file of the same name from
+The game embeds the four song files when it is built. The desktop game also reads a song file of the same name from
 the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
 version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
 the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
@@ -120,7 +121,7 @@ Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font
 
 ```
 src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
-song*.txt          the three songs, embedded by the game and edited with tools/musiceditor
+song*.txt          the four songs, embedded by the game and edited with tools/musiceditor
 platform/native/   desktop: MiniFB window, winmm sound (audio.csh), files; testing.csh writes test images and music
 tools/musiceditor/ the music editor (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
 platform/web/      browser: imports from web/shiftybits.js
@@ -152,5 +153,5 @@ with the first key press or click (browsers only allow sound after one). In the 
 
 `ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero]` plays a few automatic moves and renders
 one image;
-`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2` and `music3` the other songs, `sounds` only the
+`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2`, `music3` and `music4` the other songs, `sounds` only the
 sound effects (all for testing).
