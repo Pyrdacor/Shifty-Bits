@@ -13,7 +13,8 @@ it is a chain reaction.
 the chain step and the level. A hard drop gives 2 points per row, a soft drop 1.
 
 A block that locks (partly) above the red line ends the game. Every 30 cleared tiles the level goes up: blocks fall
-faster and get bigger (at most 3 tiles at first, up to 4x4 from level 8).
+faster (up to level 20) and get bigger (at most 3 tiles at first, up to 4x4 from level 8), and the tiles change
+their colors (8 pairs of colors that repeat).
 
 ## Game modes
 

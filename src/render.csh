@@ -20,6 +20,20 @@ const int _PanelRightW = ScreenW - 40 - _PanelRightX;
 const int _TileVariants = 4;
 const double _ToastSeconds = 4.0;
 
+// the tile colors, one line per level (after the last line they start again): stone and glow of the 1s, stone and
+// glow of the 0s. The 1s stay cool and the 0s warm, so the two are easy to tell apart at every level.
+const int _TileThemes = 8;
+const ReadOnlySlice<uint32> _TileColors = [
+    0x586682, 0x32AAFF, 0x8C6C50, 0xFF821E,     // steel blue and brown
+    0x467873, 0x28E6C8, 0x87506E, 0xFF4696,     // teal and rose
+    0x695A8C, 0xA064FF, 0x6E7D46, 0xAAFF28,     // violet and lime
+    0x4B7855, 0x3CEB6E, 0x91504B, 0xFF463C,     // green and red
+    0x6E7D8C, 0x96DCFF, 0x8C7841, 0xFFC81E,     // ice and gold
+    0x505591, 0x506EFF, 0x915F7D, 0xFF78D2,     // indigo and pink
+    0x417382, 0x1EDCFF, 0x965F41, 0xFF6414,     // cyan and copper
+    0x55826E, 0x6EFFBE, 0x73508C, 0xC85AFF,     // mint and purple
+];
+
 // the key list of the side panel and of the help screen: key, then what it does
 const ReadOnlySlice<string> _PanelKeys = [
     "← →", "MOVE", "A D", "ROLL ←→", "W S", "ROLL ↑↓", "↓", "FASTER", "SPACE", "DROP",
@@ -65,6 +79,7 @@ uint32[] _sky = [];
 uint32* _background;        // sky, well, panel frames and the key list
 uint32* _menuBackground;    // only the sky
 uint32* _tileSprites;       // [bit][falling][variant], CellSize x CellSize each
+int _bakedTheme = -1;       // the colors the tile sprites were drawn in; -1 before the first time
 
 bool _capturing;            // true while a screenshot frame is rendered (hides prompts)
 string _toast = "";
@@ -109,6 +124,9 @@ struct Render
     /// Draws everything.
     static void Frame()
     {
+        // a new level brings new tile colors; baking draws on the screen, so it comes before everything else
+        if (_bakedTheme != _Theme())
+            _BakeTiles();
         _DrawBackground();
         if (_state == State.Menu)
             _DrawMenu();
@@ -150,7 +168,9 @@ struct Render
     static unsafe void _BakeTiles()
     {
         int size = CellSize * CellSize;
-        _tileSprites = (uint32*)Memory.Allocate(2 * 2 * _TileVariants * size * sizeof(uint32));
+        if (_bakedTheme < 0)
+            _tileSprites = (uint32*)Memory.Allocate(2 * 2 * _TileVariants * size * sizeof(uint32));
+        _bakedTheme = _Theme();
         for (var bit = 0; bit < 2; bit += 1)
         {
             for (var falling = 0; falling < 2; falling += 1)
@@ -181,7 +201,7 @@ struct Render
     // a tile at (0, 0): textured stone, a recessed plate and the glowing digit
     static void _DrawTilePixels(int bit, bool falling, int seed)
     {
-        uint32 stone = bit == 1 ? Gfx.Rgb(88, 102, 130) : Gfx.Rgb(140, 108, 80);
+        uint32 stone = _TileColors[_bakedTheme * 4 + (bit == 1 ? 0 : 2)];
         int boost = falling ? 30 : 0;
         for (var y = 0; y < CellSize; y += 1)
         {
@@ -200,16 +220,23 @@ struct Render
         Gfx.BlendRect(5, 4, CellSize - 10, 1, Gfx.Rgb(0, 0, 0), 140);
 
         string digit = bit == 1 ? "1" : "0";
-        uint32 ink = bit == 1 ? Gfx.Rgb(175, 245, 255) : Gfx.Rgb(255, 215, 150);
-        Gfx.Glow(CellSize / 2, CellSize / 2, CellSize / 2 + 3, _GlowColor(bit), falling ? 130 : 90);
+        uint32 ink = Gfx.Mix(TileGlow(bit), Gfx.Rgb(255, 255, 255), 150);
+        Gfx.Glow(CellSize / 2, CellSize / 2, CellSize / 2 + 3, TileGlow(bit), falling ? 130 : 90);
         int dx = (CellSize - Gfx.TextWidth(digit, 3)) / 2 + 1;
         int dy = (CellSize - Gfx.TextHeight(3)) / 2;
         Gfx.Text(dx, dy, digit, 3, ink);
     }
 
-    static uint32 _GlowColor(int bit)
+    // which line of `_TileColors` belongs to the current level
+    static int _Theme()
     {
-        return bit == 1 ? Gfx.Rgb(50, 170, 255) : Gfx.Rgb(255, 130, 30);
+        return (Math.Max(1, _level) - 1) % _TileThemes;
+    }
+
+    /// The color in which the tiles of a bit glow at the current level.
+    static uint32 TileGlow(int bit)
+    {
+        return _TileColors[_Theme() * 4 + (bit == 1 ? 1 : 3)];
     }
 
     static unsafe void _BakeBackground()
@@ -324,7 +351,7 @@ struct Render
         if (look == TileLook.FlashWhite)
             Gfx.BlendRect(px, py, CellSize, CellSize, Gfx.Rgb(255, 255, 255), 200);
         else if (look == TileLook.FlashColor)
-            Gfx.BlendRect(px, py, CellSize, CellSize, _GlowColor(bit), 120);
+            Gfx.BlendRect(px, py, CellSize, CellSize, TileGlow(bit), 120);
     }
 
     static void _DrawBoard()

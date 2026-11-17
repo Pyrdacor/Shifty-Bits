@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|music]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|music|level2..level20]`).
 
 namespace ShiftyBits;
 
@@ -74,6 +74,12 @@ struct TestOutput
                 Game.Roll(-1);
                 Game.Update(0.3);
             }
+        }
+        // "level2" to "level20": the same board in the tile colors of that level
+        for (var n = 2; n <= 20; n += 1)
+        {
+            if (mode == "level" + n.ToString())
+                _level = n;
         }
         _capturing = mode == "over" && _state == State.GameOver;
         Console.WriteLine(Game.ModeText() + ": score " + _score.ToString() + ", time " + Game.TimeText(_playTime, true));

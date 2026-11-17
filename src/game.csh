@@ -19,6 +19,10 @@ const double _ClearTime = 0.35;
 const double _FallSpeed = 14.0;   // cells per second while the board settles
 const double _RollTime = 0.12;
 const int _TilesPerLevel = 30;
+// seconds per row at level 1 and at the level from which it gets no faster
+const double _SlowestFall = 0.75;
+const double _FastestFall = 0.07;
+const int _FastestLevel = 20;
 // the largest block (in tiles) per level; from the last entry on, everything up to 4x4
 const ReadOnlySlice<int> _MaxAreaByLevel = [3, 4, 6, 8, 8, 12, 12, 16];
 
@@ -305,7 +309,9 @@ struct Game
     /// Seconds per row of falling at the current level.
     static double GravityInterval()
     {
-        return Math.Max(0.07, 0.75 * Math.Pow(0.86, _level - 1));
+        // an even speed-up by the same factor per level, from the slowest to the fastest
+        double t = Math.Min(1.0, (_level - 1) / (double)(_FastestLevel - 1));
+        return _SlowestFall * Math.Pow(_FastestFall / _SlowestFall, t);
     }
 
     /// Whether `p` fits at its position.
@@ -739,7 +745,7 @@ struct Game
 
     static void _Sparks(int cx, int cy, int bit)
     {
-        uint32 color = bit == 1 ? Gfx.Rgb(120, 230, 255) : Gfx.Rgb(255, 180, 90);
+        uint32 color = Gfx.Mix(Render.TileGlow(bit), Gfx.Rgb(255, 255, 255), 90);
         for (var i = 0; i < 10; i += 1)
         {
             double angle = _rng.NextDouble() * Math.PI * 2.0;
