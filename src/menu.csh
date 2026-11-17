@@ -36,7 +36,7 @@ const int MenuSwitchW = (MenuRowW - 12) / 2;
 // the seed with its label
 const int MenuSeedX = MenuX + 36;
 const int MenuSeedY = MenuY + 440;
-const int MenuSeedW = 340;
+const int MenuSeedW = 308;
 const int MenuSeedH = 40;
 // the buttons shown instead of the key hints when the pointer is used
 const int MenuButtonY = MenuY + MenuH - 64;

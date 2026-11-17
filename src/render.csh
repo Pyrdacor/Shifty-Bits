@@ -658,7 +658,7 @@ struct Render
         Gfx.TextShadow(left + 70, sy, seed, 4, _seedFixed ? Gfx.Rgb(170, 230, 255) : Gfx.Rgb(255, 245, 225));
         if ((int)(_time * 2.5) % 2 == 0)
             Gfx.FillRect(left + 70 + Gfx.TextWidth(seed, 4) + 6, sy, 4, Gfx.TextHeight(4), gold);
-        string kind = _seedFixed ? "ENTERED: STAYS FOR EVERY GAME" : "RANDOM: A NEW ONE FOR EVERY GAME";
+        string kind = _seedFixed ? "ENTERED: STAYS FOR EVERY GAME" : "RANDOM: NEW FOR EVERY GAME";
         Gfx.TextShadow(right - Gfx.TextWidth(kind, 2), sy + 8, kind, 2, dim);
         Gfx.TextShadow(left, sy + 40, "THE SAME SEED ALWAYS GIVES THE SAME BLOCKS", 2, dim);
 
