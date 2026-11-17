@@ -26,6 +26,10 @@ const int ModCtrl = 2;
 /// Modifier bit for Alt.
 const int ModAlt = 4;
 
+// set by the platform while it hands over the first key press or click of the player: in the browser, that is the
+// moment the sound can start
+bool _inputStartsSound;
+
 /// Turns key presses into game actions.
 struct Input
 {
@@ -35,6 +39,14 @@ struct Input
         if (k == KeyF11 || (k == KeyEnter && (mods & ModAlt) != 0))
         {
             Platform.ToggleFullscreen();
+            return;
+        }
+        if (_state == State.Intro)
+        {
+            // Esc always skips, even the key that switches the sound on
+            if (k == KeyEscape)
+                _inputStartsSound = false;
+            Intro.Input();
             return;
         }
         if (k == 'C' && (mods & ModCtrl) != 0)
@@ -106,7 +118,9 @@ struct Input
     /// Handles a click or tap at a pixel of the screen.
     static void Pointer(int x, int y)
     {
-        if (_showHelp)
+        if (_state == State.Intro)
+            Intro.Input();
+        else if (_showHelp)
             _showHelp = false;
         else if (_state == State.Menu)
             Menu.Pointer(x, y);

@@ -70,6 +70,8 @@ enum End : uint8
 /// What the game is doing at the moment.
 enum State : uint8
 {
+    /// The intro (intro.csh).
+    Intro,
     Menu,
     Playing,
     Clearing,
@@ -403,6 +405,11 @@ struct Game
     {
         _time += dt;
         _UpdateEffects(dt);
+        if (_state == State.Intro)
+        {
+            Intro.Update(dt);
+            return;
+        }
         if (_paused || _showHelp || _state == State.Menu || _state == State.GameOver)
             return;
         _playTime += dt;

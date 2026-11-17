@@ -89,6 +89,12 @@ struct Platform
         return false;
     }
 
+    /// The desktop may always play sound.
+    static bool SoundWaiting()
+    {
+        return false;
+    }
+
     /// Puts `text` on the clipboard.
     static unsafe void CopyText(string text)
     {
@@ -222,6 +228,7 @@ int Main(string[] args)
     Music.Init(AudioRate);
     Audio.Init();
     Menu.Open();
+    Intro.Start();
     Mfb.mfb_set_target_fps(60);
 
     var timer = Mfb.mfb_timer_create();

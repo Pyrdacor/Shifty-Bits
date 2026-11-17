@@ -16,14 +16,26 @@ A block that locks (partly) above the red line ends the game. Every 30 cleared t
 faster (up to level 20) and get bigger (at most 3 tiles at first, up to 4x4 from level 8), and the tiles change
 their colors (8 pairs of colors that repeat).
 
+## Intro
+
+The game starts with a little intro in the style of the Amiga and Atari ST demo scene ([src/intro.csh](src/intro.csh)):
+copper bars, a sunset over three layers of mountains and a checkerboard floor, chains of 0s and 1s winding through
+the picture, the title flying in, zooming words and a sine scroller, to its own chip tune ([intro.txt](intro.txt)).
+A click or any key skips it; it ends by itself after about 45 seconds. In the browser, which only plays sound after a
+key or a click, the first key or click starts the intro again with its music (Esc skips at once). The INTRO button
+of the menu (or **I**) shows it again.
+
 ## Game modes
 
-The game starts with a menu: Up/Down selects the mode, Left/Right its option, Enter starts.
+The menu chooses the game mode with a selector (Left/Right or a click on its left or right half). The countdown and
+score modes have an option below it (the minutes or the target score); for the other modes that row is hidden.
+Below them are MUSIC and SOUNDS, the seed and the buttons START, NEW SEED, INTRO and HELP. Up/Down moves between the
+rows, Left/Right changes the value or the button, Enter starts the game from the mode and option rows and presses the
+selected button in the button row.
 
-The menu also works with the mouse and, in the browser, with a finger: a click or tap selects a mode, the arrows at
-the right change its option, and PLAY (or a second click on the selected mode) starts it. MUSIC and SOUNDS switch with
-a click, NEW SEED rolls a new random seed. On a phone or tablet a tap on the seed opens the on-screen keyboard to type
-one. The buttons appear as soon as the pointer is used, the key hints come back with the next key.
+The menu also works with the mouse and, in the browser, with a finger: a click or tap on a half of the mode or the
+option goes back or on, MUSIC and SOUNDS switch with a click, and the buttons do what they say. On a phone or tablet a
+tap on the seed opens the on-screen keyboard to type one.
 
 **Touch controls:** on a phone or tablet the browser version shows buttons that send the keys of the keyboard
 controls: at the left moving (held buttons repeat), FASTER and DROP, at the right a cross that rolls the rows and
@@ -63,7 +75,8 @@ After a game, **S** (or F12) saves a screenshot of the final screen, with the da
 
 ## Music editor
 
-`tools/musiceditor` is a small editor for the song files (`song.txt`, `song2.txt`, `song3.txt`, `song4.txt`). It uses the synthesizer and the sound output of the
+`tools/musiceditor` is a small editor for the song files (`song.txt`, `song2.txt`, `song3.txt`, `song4.txt` and the intro's
+`intro.txt`). It uses the synthesizer and the sound output of the
 game, so a song sounds in the editor as it does in the game.
 
 ```sh
@@ -92,7 +105,7 @@ octave above the lead).
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+S | Save |
 
-The game embeds the four song files when it is built. The desktop game also reads a song file of the same name from
+The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
 the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
 version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
 the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
@@ -109,6 +122,7 @@ the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --
 | P | Pause |
 | R | New game (same mode) |
 | H / F1 | Help |
+| I | Show the intro (in the menu) |
 | F11 / Alt+Enter | Fullscreen on / off (the image is scaled with its aspect ratio kept) |
 | S / F12 | Save a screenshot (on the game over screen) |
 | M | Music on / off |
@@ -125,6 +139,7 @@ Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font
 ```
 src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
 song*.txt          the four songs, embedded by the game and edited with tools/musiceditor
+intro.txt          the song of the intro (the same format)
 platform/native/   desktop: MiniFB window, winmm sound (audio.csh), files; testing.csh writes test images and music
 tools/musiceditor/ the music editor (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
 platform/web/      browser: imports from web/shiftybits.js
@@ -154,7 +169,7 @@ released. JavaScript then calls the frame function through the function table on
 with the first key press or click (browsers only allow sound after one). In the browser the best values are kept in
 `localStorage` and a screenshot is downloaded.
 
-`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate]` plays a few automatic moves and renders
+`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro]` plays a few automatic moves and renders
 one image;
 `ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2`, `music3` and `music4` the other songs, `sounds` only the
 sound effects (all for testing).

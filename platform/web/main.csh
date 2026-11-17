@@ -12,6 +12,7 @@ extern "C" void web_present(uint32* pixels, int count);
 extern "C" int web_poll_key();
 extern "C" int web_poll_pointer();
 extern "C" int web_touch();
+extern "C" int web_sound_waiting();
 extern "C" void web_seed_rect(int x, int y, int w, int h);
 extern "C" void web_state(int state);
 extern "C" int web_audio_rate();
@@ -52,6 +53,12 @@ struct Platform
     static bool IsTouch()
     {
         return web_touch() != 0;
+    }
+
+    /// Whether the browser still waits for a key or a click before it may play sound.
+    static bool SoundWaiting()
+    {
+        return web_sound_waiting() != 0;
     }
 
     /// Puts `text` on the clipboard.
@@ -96,22 +103,30 @@ unsafe void _Frame(double dt)
         int key = web_poll_key();
         if (key < 0)
             break;
-        Input.Key(key & 0xffff, key >> 16);
+        // bit 20 marks the first key press of the player, which switches the sound on
+        _inputStartsSound = (key & (1 << 20)) != 0;
+        Input.Key(key & 0xffff, (key >> 16) & 0xf);
+        _inputStartsSound = false;
     }
     while (true)
     {
-        // x in the low 12 bits, then y, then 1 for a click or tap and 0 for a move
+        // x in the low 12 bits, then y, then 1 for a click or tap and 0 for a move, then 1 for the first click of the
+        // player, which switches the sound on
         int pointer = web_poll_pointer();
         if (pointer < 0)
             break;
-        if ((pointer >> 24) != 0)
+        _inputStartsSound = ((pointer >> 25) & 1) != 0;
+        if (((pointer >> 24) & 1) != 0)
             Input.Pointer(pointer & 0xfff, (pointer >> 12) & 0xfff);
         else
             Input.PointerMove(pointer & 0xfff, (pointer >> 12) & 0xfff);
+        _inputStartsSound = false;
     }
-    // the page shows the touch buttons that fit: 0 menu, 1 playing, 2 paused, 3 game over, 4 help
+    // the page shows the touch buttons that fit: 0 menu, 1 playing, 2 paused, 3 game over, 4 help, 5 intro
     int state = 1;
-    if (_showHelp)
+    if (_state == State.Intro)
+        state = 5;
+    else if (_showHelp)
         state = 4;
     else if (_state == State.Menu)
         state = 0;
@@ -122,7 +137,7 @@ unsafe void _Frame(double dt)
     web_state(state);
     // where a tap opens the on-screen keyboard for the seed: only in the menu
     if (_state == State.Menu && !_showHelp)
-        web_seed_rect(MenuSeedX, MenuSeedY, MenuSeedW, MenuSeedH);
+        web_seed_rect(MenuSeedX, Menu.SeedY(), MenuSeedW, MenuSeedH);
     else
         web_seed_rect(0, 0, 0, 0);
     Game.Update(Math.Min(0.1, dt));
@@ -145,6 +160,7 @@ unsafe int Main()
     Music.Init(web_audio_rate());
     _audioChunk = (float*)Memory.Allocate(_ChunkSamples * sizeof(float));
     Menu.Open();
+    Intro.Start();
     web_set_frame(_Frame);
     // hands control to the browser; Main never returns, so nothing is cleaned up
     web_run();

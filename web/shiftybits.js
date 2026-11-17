@@ -72,6 +72,16 @@ function audioWanted() {
   return Math.max(0, Math.floor(AUDIO_AHEAD * AUDIO_RATE - queued));
 }
 
+// the first key press or click of the player starts the sound; the game learns which one it was (the intro then
+// starts again with its music)
+let gestured = false;
+function gesture() {
+  const first = !gestured;
+  gestured = true;
+  startAudio();
+  return first;
+}
+
 // ---- keyboard ----
 
 const codes = {
@@ -85,7 +95,7 @@ function toggleFullscreen() {
 }
 
 window.addEventListener('keydown', e => {
-  startAudio();
+  const first = gesture();
   // typing into the seed field of the on-screen keyboard arrives through its input event (below)
   if (e.target === seedInput) {
     if (e.key === 'Enter') seedInput.blur();
@@ -107,7 +117,7 @@ window.addEventListener('keydown', e => {
   if (code === undefined) return;
   if (code !== 301) e.preventDefault();
   const mods = (e.shiftKey ? 1 : 0) | (e.ctrlKey || e.metaKey ? 2 : 0) | (e.altKey ? 4 : 0);
-  keys.push(code | (mods << 16));
+  keys.push(code | (mods << 16) | (first ? 1 << 20 : 0));
 });
 // the game asks for the pasted text (web_paste) when it gets Ctrl+V
 let pasted = '';
@@ -116,7 +126,7 @@ window.addEventListener('paste', e => {
   e.preventDefault();
   keys.push(86 | (2 << 16));
 });
-window.addEventListener('pointerdown', () => startAudio());
+window.addEventListener('pointerdown', () => gesture());
 
 // ---- touch controls ----
 
@@ -138,7 +148,7 @@ for (const button of document.querySelectorAll('#controls button[data-key]')) {
   };
   button.addEventListener('pointerdown', e => {
     e.preventDefault();
-    startAudio();
+    gesture();
     release();
     button.setPointerCapture(e.pointerId);
     button.classList.add('down');
@@ -169,8 +179,9 @@ function toScreen(e) {
 }
 
 canvas.addEventListener('pointerdown', e => {
+  const first = gesture();
   const p = toScreen(e);
-  if (p) pointers.push(p.x | (p.y << 12) | (1 << 24));
+  if (p) pointers.push(p.x | (p.y << 12) | (1 << 24) | (first ? 1 << 25 : 0));
 });
 canvas.addEventListener('pointermove', e => {
   const p = toScreen(e);
@@ -259,9 +270,10 @@ const env = {
   web_poll_key() { return keys.length ? keys.shift() : -1; },
   web_poll_pointer() { return pointers.length ? pointers.shift() : -1; },
   web_touch() { return isTouch ? 1 : 0; },
+  web_sound_waiting() { return gestured ? 0 : 1; },
   // what the game is doing, in the order of the names: the page shows the touch buttons that fit
   web_state(state) {
-    const name = ['menu', 'play', 'pause', 'over', 'help'][state];
+    const name = ['menu', 'play', 'pause', 'over', 'help', 'intro'][state];
     if (document.body.dataset.state !== name) document.body.dataset.state = name;
   },
   web_seed_rect(x, y, w, h) { seedRect = { x, y, w, h }; },

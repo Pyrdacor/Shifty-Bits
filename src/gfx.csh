@@ -367,6 +367,14 @@ struct Gfx
         TextShadow(cx - TextWidth(text, scale) / 2, y, text, scale, c);
     }
 
+    /// Row `r` (0 at the top) of the glyph of the character `cp`: one bit per column, the leftmost column in bit 4
+    /// (0 for a character the font does not have).
+    static int GlyphRow(int cp, int r)
+    {
+        int g = _Glyph(cp);
+        return g < 0 ? 0 : (int)_glyphs[g * _GlyphRows + r];
+    }
+
     /// The height of a line of text at the given scale.
     static int TextHeight(int scale)
     {

@@ -16,6 +16,8 @@
     border: 1px solid #96784a; padding: 6px 14px; pointer-events: none; transition: opacity 0.6s;
   }
   #hint.hidden { opacity: 0; }
+  /* the intro shows its own hint */
+  body[data-state="intro"] #hint { display: none; }
 
   /* ---- touch controls: only on phones and tablets (body.touch, set by shiftybits.js) ----
      The buttons send the keys of the keyboard controls. Which of them are shown depends on what the game is doing

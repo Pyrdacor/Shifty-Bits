@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|alternate|music|level2..level20]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|intro|countdown|score|nonzero|alternate|music|level2..level20]`).
 
 namespace ShiftyBits;
 
@@ -30,25 +30,37 @@ struct TestOutput
         }
         Menu.Open();
         _seed = 12345;
+        if (mode == "intro")
+        {
+            // the intro after 20 seconds, with the title, the scroller and a zooming word
+            Intro.Start();
+            for (var i = 0; i < 20 * 60; i += 1)
+            {
+                Game.Update(1.0 / 60.0);
+            }
+            Render.Frame();
+            if (File.WriteAllBytes(path, Screenshot.Encode()) is error ie)
+                return 1;
+            return 0;
+        }
         _countdownChoice = 0;
         _scoreChoice = 0;
         bool menu = mode == "menu" || mode == "pointer";
         if (mode == "pointer")
         {
-            // the menu used with the mouse: the next countdown option, the score mode, its option before the first
-            // one (the last), then the mouse over the PLAY button
-            int rowY = MenuRowY + 20;
-            Input.Pointer(MenuRowX + MenuRowW - 40, rowY + MenuRowPitch);
-            Input.Pointer(MenuRowX + 100, rowY + 2 * MenuRowPitch);
-            Input.Pointer(MenuRowX + MenuRowW - MenuOptionW + 10, rowY + 2 * MenuRowPitch);
-            Input.PointerMove(MenuPlayX + 10, MenuButtonY + 10);
+            // the menu used with the mouse: the next mode (countdown), its next option, the next mode (score), its
+            // option before the first one (the last), then the mouse over the START button
+            Input.Pointer(MenuRowX + MenuRowW - 40, MenuModeY + 20);
+            Input.Pointer(MenuRowX + MenuRowW - 40, MenuOptionY + 20);
+            Input.Pointer(MenuRowX + MenuRowW - 40, MenuModeY + 20);
+            Input.Pointer(MenuRowX + MenuRowW - MenuOptionW + 10, MenuOptionY + 20);
+            Input.PointerMove(MenuX + _ButtonOffsets[0] + 10, Menu.ButtonY() + 10);
             Console.WriteLine("countdown option " + _countdownChoice.ToString() + ", score option " + _scoreChoice.ToString() + ", row " + _menuRow.ToString());
         }
         bool toEnd = mode == "over";
         if (mode == "countdown" || mode == "score" || mode == "nonzero" || mode == "alternate")
         {
             _mode = mode == "countdown" ? Mode.Countdown : mode == "score" ? Mode.Score : mode == "nonzero" ? Mode.NonZero : Mode.Alternate;
-            _menuRow = (int)_mode;
             toEnd = true;
         }
         if (!menu)
@@ -88,8 +100,8 @@ struct TestOutput
         if (mode == "pointer")
         {
             // after the image: PLAY must start the selected mode
-            Input.Pointer(MenuPlayX + 10, MenuButtonY + 10);
-            Console.WriteLine("after PLAY: " + (_state == State.Playing ? "playing " : "not playing ") + Game.ModeText());
+            Input.Pointer(MenuX + _ButtonOffsets[0] + 10, Menu.ButtonY() + 10);
+            Console.WriteLine("after START: " + (_state == State.Playing ? "playing " : "not playing ") + Game.ModeText());
         }
         if (File.WriteAllBytes(path, Screenshot.Encode()) is error e)
             return 1;

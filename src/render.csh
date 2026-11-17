@@ -128,6 +128,11 @@ struct Render
         // a new level brings new tile colors; baking draws on the screen, so it comes before everything else
         if (_bakedTheme != _Theme())
             _BakeTiles();
+        if (_state == State.Intro)
+        {
+            Intro.Draw();
+            return;
+        }
         _DrawBackground();
         if (_state == State.Menu)
             _DrawMenu();
@@ -606,14 +611,31 @@ struct Render
         Gfx.TextShadow(x + w - 20 - Gfx.TextWidth(state, 3), y + 10, state, 3, on ? Gfx.Rgb(190, 255, 190) : Gfx.Rgb(255, 130, 120));
     }
 
-    // a button of the menu for the mouse or a finger
-    static void _MenuButton(int x, int w, string label, int element, bool main)
+    // a button of the menu
+    static void _MenuButton(int index)
     {
-        bool hover = _menuHover == element;
+        int x = MenuX + _ButtonOffsets[index];
+        int w = _ButtonWidths[index];
+        bool main = index == 0;
+        bool lit = _pointerMode ? _menuHover == _ElStart + index : _menuRow == _RowButtons && _menuButton == index;
         uint32 gold = Gfx.Rgb(255, 205, 90);
-        Gfx.BlendRect(x, MenuButtonY, w, MenuButtonH, main ? Gfx.Rgb(150, 105, 35) : Gfx.Rgb(60, 54, 96), hover ? 230 : 160);
-        Gfx.FrameRect(x, MenuButtonY, w, MenuButtonH, 2, main || hover ? gold : Gfx.Rgb(120, 110, 160));
-        Gfx.TextCentered(x + w / 2, MenuButtonY + (MenuButtonH - Gfx.TextHeight(3)) / 2, label, 3, Gfx.Rgb(255, 245, 225));
+        Gfx.BlendRect(x, Menu.ButtonY(), w, MenuButtonH, main ? Gfx.Rgb(150, 105, 35) : Gfx.Rgb(60, 54, 96), lit ? 235 : 160);
+        Gfx.FrameRect(x, Menu.ButtonY(), w, MenuButtonH, lit ? 3 : 2, main || lit ? gold : Gfx.Rgb(120, 110, 160));
+        Gfx.TextCentered(x + w / 2, Menu.ButtonY() + (MenuButtonH - Gfx.TextHeight(3)) / 2, _ButtonLabels[index], 3, Gfx.Rgb(255, 245, 225));
+    }
+
+    // the background of a row of the menu: framed in gold when the keyboard selects it, lighter under the mouse
+    static void _MenuRowBox(int y, int h, int row)
+    {
+        if (!_pointerMode && _menuRow == row)
+        {
+            Gfx.BlendRect(MenuRowX, y, MenuRowW, h, Gfx.Rgb(110, 80, 30), 110);
+            Gfx.FrameRect(MenuRowX, y, MenuRowW, h, 2, Gfx.Rgb(255, 205, 90));
+        }
+        else if (_pointerMode && _menuHover == row)
+            Gfx.BlendRect(MenuRowX, y, MenuRowW, h, Gfx.Rgb(80, 70, 130), 90);
+        else
+            Gfx.BlendRect(MenuRowX, y, MenuRowW, h, Gfx.Rgb(0, 0, 0), 70);
     }
 
     static void _DrawMenu()
@@ -621,9 +643,11 @@ struct Render
         int x = MenuX;
         int y = MenuY;
         int w = MenuW;
-        int h = MenuH;
+        int h = Menu.Height();
         uint32 gold = Gfx.Rgb(255, 205, 90);
         uint32 dim = Gfx.Rgb(170, 160, 200);
+        uint32 bright = Gfx.Rgb(255, 245, 225);
+        uint32 arrows = Gfx.Rgb(170, 230, 255);
         Gfx.BlendRect(x, y, w, h, Gfx.Rgb(14, 12, 30), 225);
         Gfx.FrameRect(x, y, w, h, 2, Gfx.Rgb(200, 160, 70));
         Gfx.TextCentered(ScreenW / 2, y + 22, "SHIFTY BITS", 6, gold);
@@ -631,77 +655,57 @@ struct Render
 
         int left = x + 44;
         int right = x + w - 44;
-        for (var row = 0; row < ModeCount; row += 1)
+
+        // the game mode: its name between the arrows, below it its rules and its best value
+        _MenuRowBox(MenuModeY, MenuModeH, _RowMode);
+        Gfx.TextShadow(left, MenuModeY + 12, "◄", 4, arrows);
+        Gfx.TextShadow(right - Gfx.TextWidth("►", 4), MenuModeY + 12, "►", 4, arrows);
+        Gfx.TextCentered(ScreenW / 2, MenuModeY + 12, _ModeNames[(int)_mode], 4, bright);
+        Gfx.TextShadow(left, MenuModeY + 52, _ModeRules[(int)_mode], 2, Gfx.Rgb(225, 220, 240));
+        int best = _menuBest[Game.BestSlot(_mode, Game.Choice(_mode))];
+        if (best > 0)
         {
-            int ry = MenuRowY + row * MenuRowPitch;
-            bool selected = row == _menuRow;
-            var mode = (Mode)row;
-            if (selected)
-            {
-                Gfx.BlendRect(MenuRowX, ry, MenuRowW, MenuRowH, Gfx.Rgb(110, 80, 30), 110);
-                Gfx.FrameRect(MenuRowX, ry, MenuRowW, MenuRowH, 2, gold);
-            }
-            else if (_menuHover == row)
-            {
-                Gfx.BlendRect(MenuRowX, ry, MenuRowW, MenuRowH, Gfx.Rgb(80, 70, 130), 90);
-            }
-            else
-            {
-                Gfx.BlendRect(MenuRowX, ry, MenuRowW, MenuRowH, Gfx.Rgb(0, 0, 0), 70);
-            }
-            Gfx.TextShadow(left, ry + 8, _ModeNames[row], 3, selected ? Gfx.Rgb(255, 245, 225) : Gfx.Rgb(190, 185, 210));
+            string text = "BEST " + _BestText(_mode, best);
+            Gfx.TextShadow(right - Gfx.TextWidth(text, 2), MenuModeY + 52, text, 2, Gfx.Rgb(255, 215, 120));
+        }
 
-            string option = "";
-            if (mode == Mode.Countdown)
-                option = CountdownMinutes[_countdownChoice].ToString() + (_countdownChoice == 0 ? " MINUTE" : " MINUTES");
-            else if (mode == Mode.Score)
-                option = ScoreTargets[_scoreChoice].ToString() + " POINTS";
-            if (option.Length > 0)
-            {
-                // the arrows: the left and right keys change the option of the selected mode, a click or tap on an
-                // arrow that of any mode
-                if (selected || _pointerMode)
-                    option = "◄ " + option + " ►";
-                Gfx.TextShadow(right - Gfx.TextWidth(option, 3), ry + 8, option, 3, selected ? Gfx.Rgb(170, 230, 255) : Gfx.Rgb(130, 160, 185));
-            }
-
-            Gfx.TextShadow(left, ry + 38, _ModeRules[row], 2, selected ? Gfx.Rgb(225, 220, 240) : dim);
-            int best = _menuBest[Game.BestSlot(mode, Game.Choice(mode))];
-            if (best > 0)
-            {
-                string text = "BEST " + _BestText(mode, best);
-                Gfx.TextShadow(right - Gfx.TextWidth(text, 2), ry + 38, text, 2, Gfx.Rgb(255, 215, 120));
-            }
+        // the option of the mode, only for the modes that have one
+        if (Menu.HasOption(_mode))
+        {
+            _MenuRowBox(MenuOptionY, MenuOptionH, _RowOption);
+            bool countdown = _mode == Mode.Countdown;
+            string option = countdown ? CountdownMinutes[_countdownChoice].ToString() + (_countdownChoice == 0 ? " MINUTE" : " MINUTES") : ScoreTargets[_scoreChoice].ToString() + " POINTS";
+            Gfx.TextShadow(left, MenuOptionY + 12, countdown ? "TIME" : "TARGET", 3, Gfx.Rgb(190, 185, 210));
+            option = "◄ " + option + " ►";
+            Gfx.TextShadow(right - Gfx.TextWidth(option, 3), MenuOptionY + 12, option, 3, arrows);
         }
 
         // the music switch shows the name of the chosen song, as far as it fits
         string song = _songName.Length > 11 ? _songName[..11].ToString() : _songName;
-        _MenuSwitch(MenuRowX, MenuSwitchY, MenuSwitchW, "MUSIC", Music.IsOn() ? song : "OFF", Music.IsOn(), _menuRow == ModeCount || _menuHover == ModeCount);
-        _MenuSwitch(MenuRowX + MenuRowW - MenuSwitchW, MenuSwitchY, MenuSwitchW, "SOUNDS", Music.SoundsOn() ? "ON" : "OFF", Music.SoundsOn(), _menuRow == ModeCount + 1 || _menuHover == ModeCount + 1);
+        bool keys = !_pointerMode;
+        _MenuSwitch(MenuRowX, Menu.SwitchY(), MenuSwitchW, "MUSIC", Music.IsOn() ? song : "OFF", Music.IsOn(), keys ? _menuRow == _RowMusic : _menuHover == _RowMusic);
+        _MenuSwitch(MenuRowX + MenuRowW - MenuSwitchW, Menu.SwitchY(), MenuSwitchW, "SOUNDS", Music.SoundsOn() ? "ON" : "OFF", Music.SoundsOn(), keys ? _menuRow == _RowSounds : _menuHover == _RowSounds);
 
-        int sy = MenuSeedY + 6;
+        int sy = Menu.SeedY() + 6;
         string seed = _seed.ToString();
         // on a touch screen the seed is a field to tap: the browser then shows its keyboard
         if (Platform.IsTouch())
-            Gfx.FrameRect(MenuSeedX, MenuSeedY, MenuSeedW, MenuSeedH, 1, _menuHover == _ElSeed ? gold : Gfx.Rgb(120, 110, 160));
+            Gfx.FrameRect(MenuSeedX, Menu.SeedY(), MenuSeedW, MenuSeedH, 1, _menuHover == _ElSeed ? gold : Gfx.Rgb(120, 110, 160));
         Gfx.TextShadow(left, sy + 8, "SEED", 2, dim);
-        Gfx.TextShadow(left + 70, sy, seed, 4, _seedFixed ? Gfx.Rgb(170, 230, 255) : Gfx.Rgb(255, 245, 225));
+        Gfx.TextShadow(left + 70, sy, seed, 4, _seedFixed ? Gfx.Rgb(170, 230, 255) : bright);
         if ((int)(_time * 2.5) % 2 == 0)
             Gfx.FillRect(left + 70 + Gfx.TextWidth(seed, 4) + 6, sy, 4, Gfx.TextHeight(4), gold);
         string kind = _seedFixed ? "ENTERED: STAYS FOR EVERY GAME" : "RANDOM: NEW FOR EVERY GAME";
         Gfx.TextShadow(right - Gfx.TextWidth(kind, 2), sy + 8, kind, 2, dim);
         Gfx.TextShadow(left, sy + 40, "THE SAME SEED ALWAYS GIVES THE SAME BLOCKS", 2, dim);
 
-        Gfx.FillRect(x + 24, y + h - 78, w - 48, 1, Gfx.Rgb(120, 100, 60));
-        if (_pointerMode)
+        Gfx.FillRect(x + 24, Menu.ButtonY() - 14, w - 48, 1, Gfx.Rgb(120, 100, 60));
+        for (var b = 0; b < _ButtonCount; b += 1)
         {
-            _MenuButton(MenuPlayX, MenuPlayW, "PLAY", _ElPlay, true);
-            _MenuButton(MenuNewSeedX, MenuNewSeedW, "NEW SEED", _ElNewSeed, false);
-            _MenuButton(MenuHelpX, MenuHelpW, "HELP", _ElHelp, false);
-            return;
+            _MenuButton(b);
         }
-        Gfx.TextCentered(ScreenW / 2, y + h - 62, _menuRow < ModeCount ? "↑ ↓: MODE   ← →: OPTION   ENTER: PLAY   H: HELP   ESC: QUIT" : _menuRow == ModeCount ? "↑ ↓ ← →: SELECT   ENTER: NEXT SONG / OFF   H: HELP   ESC: QUIT" : "↑ ↓ ← →: SELECT   ENTER: ON / OFF   H: HELP   ESC: QUIT", 2, Gfx.Rgb(170, 230, 255));
-        Gfx.TextCentered(ScreenW / 2, y + h - 36, "0-9: TYPE A SEED   DEL: RANDOM   CTRL+C: COPY   CTRL+V: PASTE", 2, Gfx.Rgb(170, 230, 255));
+        if (!Platform.IsTouch())
+            Gfx.TextCentered(ScreenW / 2, y + h - 34, "↑ ↓: SELECT   ← →: CHANGE   ENTER: OK   0-9: SEED   ESC: QUIT", 2, arrows);
     }
 
     static void _DrawHelp()
