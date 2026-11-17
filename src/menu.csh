@@ -18,7 +18,9 @@ const int _ElNewSeed = ModeCount + 4;
 const int _ElHelp = ModeCount + 5;
 
 const int MenuW = 780;
-const int MenuH = 600;
+// the music and sound row below the modes, the seed below it and the buttons at the bottom
+const int _MenuSwitchTop = 110 + ModeCount * MenuRowPitch;
+const int MenuH = _MenuSwitchTop + 210;
 const int MenuX = (ScreenW - MenuW) / 2;
 const int MenuY = (ScreenH - MenuH) / 2;
 // the rows of the game modes
@@ -30,12 +32,12 @@ const int MenuRowH = 62;
 // the part at the right of a mode row that changes its option: its left half goes back, its right half on
 const int MenuOptionW = 292;
 // music and sounds beside each other
-const int MenuSwitchY = MenuY + 390;
+const int MenuSwitchY = MenuY + _MenuSwitchTop;
 const int MenuSwitchH = 40;
 const int MenuSwitchW = (MenuRowW - 12) / 2;
 // the seed with its label
 const int MenuSeedX = MenuX + 36;
-const int MenuSeedY = MenuY + 440;
+const int MenuSeedY = MenuSwitchY + 50;
 const int MenuSeedW = 308;
 const int MenuSeedH = 40;
 // the buttons shown instead of the key hints when the pointer is used
@@ -82,8 +84,8 @@ struct Menu
         Music.Stop();
         if (!_seedFixed)
             _seed = Game.RandomSeed();
-        _menuBest = new int[BestSlots];
-        for (var i = 0; i < BestSlots; i += 1)
+        _menuBest = new int[StoredSlots];
+        for (var i = 0; i < StoredSlots; i += 1)
         {
             _menuBest[i] = Platform.LoadBest(i);
         }

@@ -58,12 +58,13 @@ const ReadOnlySlice<string> _HelpRules = [
     "A BLOCK THAT LANDS ABOVE THE RED LINE ENDS THE GAME.",
 ];
 
-const ReadOnlySlice<string> _ModeNames = ["NORMAL MODE", "COUNTDOWN MODE", "SCORE MODE", "NON-ZERO MODE"];
+const ReadOnlySlice<string> _ModeNames = ["NORMAL MODE", "COUNTDOWN MODE", "SCORE MODE", "NON-ZERO MODE", "ALTERNATE MODE"];
 const ReadOnlySlice<string> _ModeRules = [
     "PLAY UNTIL THE WELL IS FULL",
     "THE MOST POINTS BEFORE THE TIME RUNS OUT",
     "REACH THE TARGET SCORE IN THE SHORTEST TIME",
     "ONLY 1S SCORE: 4 ZEROS IN A ROW END THE GAME",
+    "CLEAR 1S AND 0S IN TURN, ELSE THE GAME ENDS",
 ];
 
 /// How a tile is drawn.
@@ -465,9 +466,34 @@ struct Render
     // one labelled value of the left panel
     static void _PanelValue(int index, string label, string value, uint32 color)
     {
-        int y = 166 + index * 66;
+        int y = _PanelValueY(index);
         Gfx.TextShadow(_PanelLeftX + 20, y, label, 2, Gfx.Rgb(170, 160, 200));
         Gfx.TextShadow(_PanelLeftX + 20, y + 20, value, 4, color);
+    }
+
+    // the top of a value of the left panel; the alternate mode has one more value, so they are closer together
+    static int _PanelValueY(int index)
+    {
+        return 166 + index * (_mode == Mode.Alternate ? 60 : 66);
+    }
+
+    // the alternate mode: which bit must be cleared next, with its tile
+    static void _DrawNextBit()
+    {
+        int y = _PanelValueY(6);
+        int x = _PanelLeftX + 20;
+        Gfx.TextShadow(x, y, "CLEAR NEXT", 2, Gfx.Rgb(170, 160, 200));
+        int ty = y + 20 + (Gfx.TextHeight(4) - CellSize) / 2;
+        if (_nextBit < 0)
+        {
+            // at the start either bit may come first
+            _DrawTile(x, ty, 1, TileLook.Resting, 0);
+            _DrawTile(x + CellSize + 4, ty, 0, TileLook.Resting, 1);
+            Gfx.TextShadow(x + 2 * CellSize + 16, y + 20, "ANY", 4, Gfx.Rgb(235, 225, 210));
+            return;
+        }
+        _DrawTile(x, ty, _nextBit, TileLook.Resting, 0);
+        Gfx.TextShadow(x + CellSize + 12, y + 20, _nextBit.ToString() + "S", 4, Gfx.Mix(TileGlow(_nextBit), Gfx.Rgb(255, 255, 255), 100));
     }
 
     // the best value of a mode as text: a time in the score mode, else a score
@@ -493,6 +519,8 @@ struct Render
         _PanelValue(3, "LEVEL", _level.ToString(), Gfx.Rgb(170, 230, 255));
         _PanelValue(4, "TILES CLEARED", _tilesCleared.ToString(), Gfx.Rgb(235, 225, 210));
         _PanelValue(5, "BEST CHAIN", _bestChain.ToString(), Gfx.Rgb(255, 170, 120));
+        if (_mode == Mode.Alternate)
+            _DrawNextBit();
         Gfx.TextShadow(lx, 590, "SEED " + _seed.ToString(), 2, Gfx.Rgb(170, 160, 200));
 
         int nx = _PanelRightX + (_PanelRightW - _next.W * CellSize) / 2;
@@ -547,6 +575,8 @@ struct Render
             info += " OF " + Game.Target().ToString();
         if (_end == End.Zeros)
             info = "4 ZEROS IN A ROW   " + info;
+        else if (_end == End.WrongBit)
+            info = (1 - _nextBit).ToString() + "S TWICE IN A ROW   " + info;
         if (_newBest)
             info += "   NEW BEST!";
         Gfx.TextCentered(ScreenW / 2, y + 90, info, 3, Gfx.Rgb(240, 235, 250));

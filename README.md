@@ -38,9 +38,11 @@ them.
 | Countdown | 1, 3, 5 or 10 minutes: the most points before the time runs out. A chain reaction that is still running at 0:00 is finished and counts. |
 | Score | Reach 1000, 10000, 50000 or 100000 points in the shortest time. The clock stops when the target is reached; a full well ends the game without a time. |
 | Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. |
+| Alternate | The rules of the normal mode, but 1s and 0s must be cleared in turn; either may come first. Clearing 1s and 0s at the same time is always allowed and keeps the turn (after it, the same bit is due again). Clearing the bit that is not due ends the game; every step of a chain reaction counts. The left panel shows which bit is due next. |
 
 Every mode and option has its own best value (a score, or a time in the score mode), kept in `shiftybits-best.txt`
-(one line per mode and option, then one line with the music and sound settings).
+(one line per mode and option of the first four modes, then one line with the music and sound settings, then the
+line of the alternate mode).
 
 **Seed:** the blocks of a game come from its seed, a number of up to 9 digits: the same seed gives the same blocks
 (a block depends on the seed, its position in the sequence and the level at which it appears). Normally the seed is
@@ -152,7 +154,7 @@ released. JavaScript then calls the frame function through the function table on
 with the first key press or click (browsers only allow sound after one). In the browser the best values are kept in
 `localStorage` and a screenshot is downloaded.
 
-`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero]` plays a few automatic moves and renders
+`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate]` plays a few automatic moves and renders
 one image;
 `ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2`, `music3` and `music4` the other songs, `sounds` only the
 sound effects (all for testing).

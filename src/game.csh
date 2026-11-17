@@ -31,13 +31,13 @@ const ReadOnlySlice<int> CountdownMinutes = [1, 3, 5, 10];
 /// The target scores of the score mode.
 const ReadOnlySlice<int> ScoreTargets = [1000, 10000, 50000, 100000];
 /// The number of game modes.
-const int ModeCount = 4;
-/// The number of best values kept: one per mode and option (see `Game.BestSlot`).
-const int BestSlots = 10;
-/// Where the settings are kept, after the best values: bit 0 set means music off, bit 1 sound effects off.
+const int ModeCount = 5;
+/// Where the settings are kept, after the best values of the first modes: bit 0 set means music off, bit 1 sound
+/// effects off.
 const int SettingsSlot = 10;
-/// The number of values the platform stores.
-const int StoredSlots = 11;
+/// The number of values the platform stores: the best value of every mode and option (see `Game.BestSlot`) and the
+/// settings.
+const int StoredSlots = 12;
 /// The largest seed (9 digits).
 const int MaxSeed = 999999999;
 
@@ -52,6 +52,8 @@ enum Mode : uint8
     Score,
     /// Like `Normal`, but a run of zeros ends the game.
     NonZero,
+    /// Like `Normal`, but 1s and 0s must be cleared in turn: clearing the same bit twice ends the game.
+    Alternate,
 }
 
 /// Why a game ended.
@@ -61,6 +63,8 @@ enum End : uint8
     TimeUp,
     TargetReached,
     Zeros,
+    /// The same bit cleared twice in a row in the alternate mode.
+    WrongBit,
 }
 
 /// What the game is doing at the moment.
@@ -158,6 +162,8 @@ bool _pieceLanded;
 // seconds played (not counting pauses)
 double _playTime;
 bool _newBest;
+// the alternate mode: the bit that must be cleared next, -1 while either may be (at the start)
+int _nextBit = -1;
 int[] _cells = [];
 bool[] _clearing = [];
 double[] _fall = [];       // visual offset in cells, counts down to 0 while settling
@@ -217,6 +223,9 @@ struct Game
                 return 5 + choice;
             case Mode.NonZero:
                 return 9;
+            case Mode.Alternate:
+                // the settings were kept in slot 10 before this mode existed
+                return 11;
         }
         return 0;
     }
@@ -244,6 +253,8 @@ struct Game
                 return "SCORE MODE " + ScoreTargets[_scoreChoice].ToString();
             case Mode.NonZero:
                 return "NON-ZERO MODE";
+            case Mode.Alternate:
+                return "ALTERNATE MODE";
         }
         return "";
     }
@@ -291,6 +302,7 @@ struct Game
         _pieceCount = 0;
         _playTime = 0.0;
         _newBest = false;
+        _nextBit = -1;
         _popups = List<Popup>.Create();
         _particles = List<Particle>.Create();
         _best = Platform.LoadBest(BestSlot(_mode, Choice(_mode)));
@@ -564,6 +576,7 @@ struct Game
         int runs = 0;
         int points = 0;
         bool zeros = false;
+        bool ones = false;
         int sumX = 0;
         int sumY = 0;
         int marked = 0;
@@ -587,6 +600,7 @@ struct Game
                 if (v != _Empty && len >= _RunLength)
                 {
                     zeros = zeros || v == 0;
+                    ones = ones || v == 1;
                     runs += 1;
                     points += _RunPoints(len);
                     for (var k = x; k < end; k += 1)
@@ -613,6 +627,7 @@ struct Game
                 if (v != _Empty && len >= _RunLength)
                 {
                     zeros = zeros || v == 0;
+                    ones = ones || v == 1;
                     runs += 1;
                     points += _RunPoints(len);
                     for (var k = y; k < end; k += 1)
@@ -634,6 +649,19 @@ struct Game
             }
             _Finish(End.Zeros);
             return true;
+        }
+        if (_mode == Mode.Alternate && zeros != ones)
+        {
+            // runs of one kind only: they must be the bit whose turn it is, then the other one comes next; runs of
+            // both kinds at once are always allowed and leave the turn as it is
+            int bit = ones ? 1 : 0;
+            if (_nextBit >= 0 && bit != _nextBit)
+            {
+                // the runs that ended the game stay marked
+                _Finish(End.WrongBit);
+                return true;
+            }
+            _nextBit = 1 - bit;
         }
 
         for (var i = 0; i < _clearing.Length; i += 1)

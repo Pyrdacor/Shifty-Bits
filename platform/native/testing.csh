@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|music|level2..level20]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|countdown|score|nonzero|alternate|music|level2..level20]`).
 
 namespace ShiftyBits;
 
@@ -9,7 +9,7 @@ using System;
 struct TestOutput
 {
     /// Writes `path`: the menu (`mode` menu), a screenshot after a few automatic moves (`mode` play, over or help),
-    /// a game played to its end in another game mode (`mode` countdown, score or nonzero), or 40 seconds of music as
+    /// a game played to its end in another game mode (`mode` countdown, score, nonzero or alternate), or 40 seconds of music as
     /// a WAV file (`mode` music).
     static int Write(string path, string mode)
     {
@@ -45,9 +45,9 @@ struct TestOutput
             Console.WriteLine("countdown option " + _countdownChoice.ToString() + ", score option " + _scoreChoice.ToString() + ", row " + _menuRow.ToString());
         }
         bool toEnd = mode == "over";
-        if (mode == "countdown" || mode == "score" || mode == "nonzero")
+        if (mode == "countdown" || mode == "score" || mode == "nonzero" || mode == "alternate")
         {
-            _mode = mode == "countdown" ? Mode.Countdown : mode == "score" ? Mode.Score : Mode.NonZero;
+            _mode = mode == "countdown" ? Mode.Countdown : mode == "score" ? Mode.Score : mode == "nonzero" ? Mode.NonZero : Mode.Alternate;
             _menuRow = (int)_mode;
             toEnd = true;
         }
