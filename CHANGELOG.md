@@ -2,8 +2,7 @@
 
 ## 1.2
 
-- The fifth song is now FAST LANE, a driving piece with four on the floor and a lead like a bass guitar, instead of
-  DRIFTWOOD.
+- The fifth song is now AURORA, light and melancholic electronic pop with a bouncing synth bass, instead of DRIFTWOOD.
 - Browser on phones and tablets: the first tap starts the sound of the intro (it stayed silent until the second tap).
 
 ## 1.1

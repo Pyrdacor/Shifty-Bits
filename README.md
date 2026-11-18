@@ -67,13 +67,12 @@ chosen song in a loop (a little faster on higher levels), plus
 sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
 sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the five
 songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
-AFTERGLOW in [song4.txt](song4.txt), FAST LANE in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
+AFTERGLOW in [song4.txt](song4.txt), AURORA in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
 
-FAST LANE drives: 64 bars (about 2:10) at 120 BPM in E minor, where the echo of the synthesizer (375 ms) is a dotted
-8th. Four on the floor and a pulsing sub bass under soft pads, and a lead played like a bass guitar that builds up
-through the song: octave pumping in the intro, a syncopated riff in the verse, rising runs in the build, the hook up
-high in the chorus, a break and the hook once more.
+AURORA is light and melancholic electronic pop: 64 bars (about 2:10) at 120 BPM in D minor, where the echo of the
+synthesizer (375 ms) is a dotted 8th. A bouncing staccato synth bass in 16ths, warm offbeat electric piano chords, a
+plucked lead that rings through the echo, four on the floor with claps and 16th hats, and quiet pads behind it.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
