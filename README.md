@@ -168,7 +168,7 @@ tools/build-linux.sh   # -> bin/shiftybits; builds MiniFB into lib/linux/ the fi
 The version is `GameVersion` in [src/version.csh](src/version.csh); it is shown in the title bar, in the menu and in
 the intro.
 
-**Releases:** pushing a tag `v<version>` (matching `GameVersion`), or starting the workflow by hand with "publish"
+**Releases:** the notes of a release take the section of the version from [CHANGELOG.md](CHANGELOG.md). Pushing a tag `v<version>` (matching `GameVersion`), or starting the workflow by hand with "publish"
 checked (it then creates the tag), starts
 [.github/workflows/release.yml](.github/workflows/release.yml): it builds and tests the Windows, Linux and browser
 versions and publishes them as a GitHub release (`ShiftyBits-<version>-windows-x64.zip`, `-linux-x64.tar.gz`,
