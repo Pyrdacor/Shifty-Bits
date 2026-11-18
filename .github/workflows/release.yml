@@ -1,15 +1,21 @@
 # Builds Shifty Bits for Windows, Linux and the browser and publishes the three as a GitHub release.
 #
-# A release is made by pushing a tag `v<version>`, where the version is `GameVersion` in src/version.csh:
-#   git tag v1.0 && git push origin v1.0
-# Started by hand (workflow_dispatch), it only builds and keeps the packages as artifacts of the run, to try a build
-# before tagging it.
+# The version is `GameVersion` in src/version.csh. A release is made in one of two ways:
+#   - pushing a tag `v<version>`: git tag v1.0 && git push origin v1.0
+#   - starting the workflow by hand (Actions > Release > Run workflow) with "publish" checked: it creates the tag
+#     `v<version>` on the commit it builds, and the release.
+# Started by hand without "publish", it only builds and keeps the packages as artifacts of the run, to try a build.
 name: Release
 
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the release (creates the tag v<version>)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -163,7 +169,7 @@ jobs:
           path: ${{ env.PACKAGE }}.zip
 
   release:
-    if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag' || inputs.publish
     needs: [version, windows, linux, web]
     runs-on: ubuntu-latest
     permissions:
@@ -193,4 +199,6 @@ jobs:
 
           The best values, the settings and the screenshots are kept in the folder the game is started in.
           EOF
-          gh release create "$GITHUB_REF_NAME" packages/* --repo "$GITHUB_REPOSITORY" --title "Shifty Bits $VERSION" --notes-file notes.md
+          # for a pushed tag that tag; started by hand, the tag of the version is created on the commit that was built
+          tag="v$VERSION"
+          gh release create "$tag" packages/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Shifty Bits $VERSION" --notes-file notes.md
