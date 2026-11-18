@@ -173,6 +173,15 @@ struct Menu
     /// Handles one key press while the menu is shown.
     static void Key(int k, int mods)
     {
+        int before = _seed;
+        _Key(k, mods);
+        // the easter egg tells that it was found
+        if (_seed != before && Game.SwordAndShield())
+            Render.Toast("TO ARMS! THE BITS TAKE UP SWORDS AND SHIELDS");
+    }
+
+    static void _Key(int k, int mods)
+    {
         if (k == KeySeedInput)
         {
             // every change of the on-screen keyboard's text arrives as the whole text

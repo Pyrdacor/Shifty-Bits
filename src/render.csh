@@ -67,6 +67,35 @@ const ReadOnlySlice<string> _ModeRules = [
     "CLEAR 1S AND 0S IN TURN, ELSE THE GAME ENDS",
 ];
 
+// the easter egg (seed 79732267, "PYRDACOR" on the keys of a phone): the tiles show a sword instead of the 1 and a
+// shield instead of the 0. 'X' is drawn in the light ink of the digits, 'o' in the glow color of the tile.
+const ReadOnlySlice<string> _SwordPixels = [
+    "....X....",
+    "...XoX...",
+    "...XoX...",
+    "...XoX...",
+    "...XoX...",
+    "...XoX...",
+    "...XoX...",
+    ".XXXXXXX.",
+    "....o....",
+    "....o....",
+    "...XXX...",
+];
+const ReadOnlySlice<string> _ShieldPixels = [
+    "XXXXXXXXX",
+    "XoooXoooX",
+    "XoooXoooX",
+    "XXXXXXXXX",
+    "XoooXoooX",
+    "XoooXoooX",
+    ".XooXooX.",
+    ".XooXooX.",
+    "..XoXoX..",
+    "...XXX...",
+    "....X....",
+];
+
 /// How a tile is drawn.
 enum TileLook : uint8
 {
@@ -81,6 +110,7 @@ uint32* _background;        // sky, well, panel frames and the key list
 uint32* _menuBackground;    // only the sky
 uint32* _tileSprites;       // [bit][falling][variant], CellSize x CellSize each
 int _bakedTheme = -1;       // the colors the tile sprites were drawn in; -1 before the first time
+bool _bakedArms;            // whether the tile sprites show the sword and the shield of the easter egg
 
 bool _capturing;            // true while a screenshot frame is rendered (hides prompts)
 string _toast = "";
@@ -126,7 +156,7 @@ struct Render
     static void Frame()
     {
         // a new level brings new tile colors; baking draws on the screen, so it comes before everything else
-        if (_bakedTheme != _Theme())
+        if (_bakedTheme != _Theme() || _bakedArms != Game.SwordAndShield())
             _BakeTiles();
         if (_state == State.Intro)
         {
@@ -177,6 +207,7 @@ struct Render
         if (_bakedTheme < 0)
             _tileSprites = (uint32*)Memory.Allocate(2 * 2 * _TileVariants * size * sizeof(uint32));
         _bakedTheme = _Theme();
+        _bakedArms = Game.SwordAndShield();
         for (var bit = 0; bit < 2; bit += 1)
         {
             for (var falling = 0; falling < 2; falling += 1)
@@ -228,6 +259,24 @@ struct Render
         string digit = bit == 1 ? "1" : "0";
         uint32 ink = Gfx.Mix(TileGlow(bit), Gfx.Rgb(255, 255, 255), 150);
         Gfx.Glow(CellSize / 2, CellSize / 2, CellSize / 2 + 3, TileGlow(bit), falling ? 130 : 90);
+        if (_bakedArms)
+        {
+            // a picture of 9 x 11 pixels of 2 x 2, about as big as the digit
+            var picture = bit == 1 ? _SwordPixels : _ShieldPixels;
+            int px = (CellSize - 18) / 2;
+            int py = (CellSize - 22) / 2;
+            for (var r = 0; r < picture.Length; r += 1)
+            {
+                for (var c = 0; c < picture[r].Length; c += 1)
+                {
+                    if (picture[r][c] == 'X')
+                        Gfx.FillRect(px + c * 2, py + r * 2, 2, 2, ink);
+                    else if (picture[r][c] == 'o')
+                        Gfx.FillRect(px + c * 2, py + r * 2, 2, 2, TileGlow(bit));
+                }
+            }
+            return;
+        }
         int dx = (CellSize - Gfx.TextWidth(digit, 3)) / 2 + 1;
         int dy = (CellSize - Gfx.TextHeight(3)) / 2;
         Gfx.Text(dx, dy, digit, 3, ink);
@@ -237,6 +286,14 @@ struct Render
     static int _Theme()
     {
         return (Math.Max(1, _level) - 1) % _TileThemes;
+    }
+
+    /// What the tiles of a bit are called: 1S and 0S, or swords and shields in the easter egg.
+    static string BitName(int bit)
+    {
+        if (Game.SwordAndShield())
+            return bit == 1 ? "SWORDS" : "SHIELDS";
+        return bit == 1 ? "1S" : "0S";
     }
 
     /// The color in which the tiles of a bit glow at the current level.
@@ -498,7 +555,7 @@ struct Render
             return;
         }
         _DrawTile(x, ty, _nextBit, TileLook.Resting, 0);
-        Gfx.TextShadow(x + CellSize + 12, y + 20, _nextBit.ToString() + "S", 4, Gfx.Mix(TileGlow(_nextBit), Gfx.Rgb(255, 255, 255), 100));
+        Gfx.TextShadow(x + CellSize + 12, y + 20, BitName(_nextBit), 4, Gfx.Mix(TileGlow(_nextBit), Gfx.Rgb(255, 255, 255), 100));
     }
 
     // the best value of a mode as text: a time in the score mode, else a score
@@ -581,7 +638,7 @@ struct Render
         if (_end == End.Zeros)
             info = "4 ZEROS IN A ROW   " + info;
         else if (_end == End.WrongBit)
-            info = (1 - _nextBit).ToString() + "S TWICE IN A ROW   " + info;
+            info = BitName(1 - _nextBit) + " TWICE IN A ROW   " + info;
         if (_newBest)
             info += "   NEW BEST!";
         Gfx.TextCentered(ScreenW / 2, y + 90, info, 3, Gfx.Rgb(240, 235, 250));

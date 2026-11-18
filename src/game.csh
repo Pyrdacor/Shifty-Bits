@@ -40,6 +40,9 @@ const int SettingsSlot = 10;
 const int StoredSlots = 12;
 /// The largest seed (9 digits).
 const int MaxSeed = 999999999;
+/// The seed of the easter egg: "PYRDACOR" typed on the keys of a phone (P 7, Y 9, R 7, D 3, A 2, C 2, O 6, R 7).
+/// Its tiles show swords and shields instead of 1s and 0s.
+const int PyrdacorSeed = 79732267;
 
 /// The rules of a game.
 enum Mode : uint8
@@ -204,6 +207,12 @@ struct Game
         if (!_seedFixed)
             _seed = RandomSeed();
         NewGame();
+    }
+
+    /// Whether the easter egg is on: the seed is `PyrdacorSeed`.
+    static bool SwordAndShield()
+    {
+        return _seed == PyrdacorSeed;
     }
 
     /// A random seed.
