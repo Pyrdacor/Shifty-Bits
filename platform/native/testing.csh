@@ -9,17 +9,17 @@ using System;
 struct TestOutput
 {
     /// Writes `path`: the menu (`mode` menu), a screenshot after a few automatic moves (`mode` play, over or help),
-    /// a game played to its end in another game mode (`mode` countdown, score, nonzero or alternate), or 40 seconds of music as
-    /// a WAV file (`mode` music).
+    /// a game played to its end in another game mode (`mode` countdown, score, nonzero or alternate), or the music once through
+    /// as a WAV file (`mode` music).
     static int Write(string path, string mode)
     {
         Gfx.Init();
         Render.Init();
         Music.Init(AudioRate);
-        if (mode == "music2" || mode == "music3" || mode == "music4")
+        if (mode == "music2" || mode == "music3" || mode == "music4" || mode == "music5")
         {
             // the other built-in songs
-            Music.SelectSong(mode == "music2" ? 1 : mode == "music3" ? 2 : 3);
+            Music.SelectSong(mode == "music2" ? 1 : mode == "music3" ? 2 : mode == "music4" ? 3 : 4);
             return _MusicWav(path);
         }
         if (mode == "intromusic")
@@ -115,11 +115,11 @@ struct TestOutput
         return 0;
     }
 
-    // 40 seconds of music with a few sound effects
+    // the song once through (at least 40 seconds) with a few sound effects
     static unsafe int _MusicWav(string path)
     {
         Music.Start();
-        int count = AudioRate * 40;
+        int count = Math.Max(AudioRate * 40, (int)(Song.Steps() * 15.0 / _songBpm * AudioRate));
         var bytes = new uint8[44 + count * 2];
         _Tag(bytes, 0, "RIFF");
         _Tag(bytes, 8, "WAVE");

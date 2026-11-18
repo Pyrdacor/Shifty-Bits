@@ -77,7 +77,7 @@ struct Menu
             int settings = Platform.LoadBest(SettingsSlot);
             Music.SetOn((settings & 1) == 0);
             Music.SetSoundsOn((settings & 2) == 0);
-            _SelectSong((settings >> 2) & 3);
+            _SelectSong((settings >> 2) & 7);
             _settingsLoaded = true;
             // a phone or tablet starts with the buttons
             _pointerMode = Platform.IsTouch();

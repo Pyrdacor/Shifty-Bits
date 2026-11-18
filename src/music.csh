@@ -18,15 +18,16 @@ enum Sfx : uint8
 const int _VoiceCount = 32;
 
 /// The number of songs built into the program.
-const int SongCount = 4;
+const int SongCount = 5;
 /// The files of the built-in songs. The editor works on such a file, and the desktop game prefers a file of this name
 /// in its folder to the built-in song.
-const ReadOnlySlice<string> SongFiles = ["song.txt", "song2.txt", "song3.txt", "song4.txt"];
+const ReadOnlySlice<string> SongFiles = ["song.txt", "song2.txt", "song3.txt", "song4.txt", "song5.txt"];
 
 const ReadOnlySlice<string> _SongLines = embed_lines("../song.txt");
 const ReadOnlySlice<string> _Song2Lines = embed_lines("../song2.txt");
 const ReadOnlySlice<string> _Song3Lines = embed_lines("../song3.txt");
 const ReadOnlySlice<string> _Song4Lines = embed_lines("../song4.txt");
+const ReadOnlySlice<string> _Song5Lines = embed_lines("../song5.txt");
 
 // ---- instruments of the sound effects ----
 
@@ -116,7 +117,7 @@ struct Music
     static void SelectSong(int index)
     {
         _songIndex = Math.Clamp(index, 0, SongCount - 1);
-        LoadSong(_songIndex == 1 ? _Song2Lines : _songIndex == 2 ? _Song3Lines : _songIndex == 3 ? _Song4Lines : _SongLines);
+        LoadSong(_songIndex == 1 ? _Song2Lines : _songIndex == 2 ? _Song3Lines : _songIndex == 3 ? _Song4Lines : _songIndex == 4 ? _Song5Lines : _SongLines);
     }
 
     /// The number of the song chosen with `SelectSong`.

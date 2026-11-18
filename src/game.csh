@@ -33,7 +33,7 @@ const ReadOnlySlice<int> ScoreTargets = [1000, 10000, 50000, 100000];
 /// The number of game modes.
 const int ModeCount = 5;
 /// Where the settings are kept, after the best values of the first modes: bit 0 set means music off, bit 1 sound
-/// effects off.
+/// effects off, bits 2 to 4 are the number of the song.
 const int SettingsSlot = 10;
 /// The number of values the platform stores: the best value of every mode and option (see `Game.BestSlot`) and the
 /// settings.
