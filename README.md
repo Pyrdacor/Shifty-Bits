@@ -65,21 +65,17 @@ the game and on the final screen, where Ctrl+C copies it as well.
 **Music and sound** come from a small synthesizer written in CShift ([src/music.csh](src/music.csh)): it plays the
 chosen song in a loop (a little faster on higher levels), plus
 sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
-sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the five
+sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the four
 songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
-AFTERGLOW in [song4.txt](song4.txt), NIGHT DRIVE in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
+AFTERGLOW in [song4.txt](song4.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
-
-NIGHT DRIVE is calm synthwave: 40 bars (about 1:20) at 120 BPM in C minor. Wide saw pads and a pulse arpeggio in
-16ths carry it all the way, a soft triangle melody sits inside the pads, a warm saw bass with a quiet sine sub moves
-in half notes, under a soft kick on 1 and 3 and sparse hi-hats.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
 
 ## Music editor
 
-`tools/musiceditor` is a small editor for the song files (`song.txt` to `song5.txt` and the intro's
+`tools/musiceditor` is a small editor for the song files (`song.txt` to `song4.txt` and the intro's
 `intro.txt`). It uses the synthesizer and the sound output of the
 game, so a song sounds in the editor as it does in the game.
 
@@ -109,7 +105,7 @@ octave above the lead).
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+S | Save |
 
-The game embeds the five song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
+The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
 the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
 version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
 the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
@@ -142,7 +138,7 @@ Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font
 
 ```
 src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
-song*.txt          the five songs, embedded by the game and edited with tools/musiceditor
+song*.txt          the four songs, embedded by the game and edited with tools/musiceditor
 intro.txt          the song of the intro (the same format)
 platform/native/   desktop (Windows and Linux): MiniFB window, files; testing.csh writes test images and music
 platform/windows/  Windows: winmm sound (audio.csh), clipboard
@@ -193,5 +189,5 @@ with the first key press or click (browsers only allow sound after one). In the 
 
 `ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro]` plays a few automatic moves and renders
 one image;
-`ShiftyBits.exe --shot music.wav music` renders the song once through (at least 40 seconds), `music2` to `music5` the other songs, `intromusic` the intro's song, `sounds` only the
+`ShiftyBits.exe --shot music.wav music` renders the song once through (at least 40 seconds), `music2` to `music4` the other songs, `intromusic` the intro's song, `sounds` only the
 sound effects (all for testing).
