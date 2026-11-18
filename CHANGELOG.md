@@ -2,7 +2,8 @@
 
 ## 1.2
 
-- The fifth song is now AURORA, light and melancholic electronic pop with a bouncing synth bass, instead of DRIFTWOOD.
+- The fifth song is now AURORA, short electronic pop around one hook, with a bouncing synth bass, instead of
+  DRIFTWOOD.
 - Browser on phones and tablets: the first tap starts the sound of the intro (it stayed silent until the second tap).
 
 ## 1.1

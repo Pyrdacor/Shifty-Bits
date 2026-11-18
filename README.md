@@ -70,9 +70,10 @@ songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OV
 AFTERGLOW in [song4.txt](song4.txt), AURORA in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
 
-AURORA is light and melancholic electronic pop: 64 bars (about 2:10) at 120 BPM in D minor, where the echo of the
-synthesizer (375 ms) is a dotted 8th. A bouncing staccato synth bass in 16ths, warm offbeat electric piano chords, a
-plucked lead that rings through the echo, four on the floor with claps and 16th hats, and quiet pads behind it.
+AURORA is light and melancholic electronic pop, short and built around one hook: 32 bars (about a minute) at 120 BPM
+in D minor, where the echo of the synthesizer (375 ms) is a dotted 8th. A low, rhythmic verse that ends on the
+dominant, then the hook twice, the second time with a harmony voice, and a short break. Under it a bouncing staccato
+synth bass, warm offbeat electric piano chords, four on the floor with claps and 16th hats, and quiet pads.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
