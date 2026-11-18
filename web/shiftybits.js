@@ -127,6 +127,10 @@ window.addEventListener('paste', e => {
   keys.push(86 | (2 << 16));
 });
 window.addEventListener('pointerdown', () => gesture());
+// With a finger, browsers only allow sound from the moment the finger is lifted (pointerdown counts only for a mouse):
+// an AudioContext made on touching stays suspended, so it is started again then. Without this, the first tap would
+// leave the intro silent and only the second one (which skips it) would start the sound.
+for (const type of ['pointerup', 'touchend', 'click']) window.addEventListener(type, () => { if (gestured) startAudio(); });
 
 // ---- touch controls ----
 
