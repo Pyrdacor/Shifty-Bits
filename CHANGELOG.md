@@ -2,7 +2,8 @@
 
 ## 1.2
 
-- The fifth song is now STILLWATER, an ambient piece (about 3:40, no drums) instead of DRIFTWOOD.
+- The fifth song is now STILLWATER, an ambient piece (about 3:30, low and soft, long pads, no drums) instead of
+  DRIFTWOOD.
 - Browser on phones and tablets: the first tap starts the sound of the intro (it stayed silent until the second tap).
 
 ## 1.1

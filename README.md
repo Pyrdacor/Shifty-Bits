@@ -70,9 +70,10 @@ songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OV
 AFTERGLOW in [song4.txt](song4.txt), STILLWATER in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
 
-STILLWATER is the ambient one for long games: 64 bars (about 3:40) at 70 BPM without drums. Slowly swelling pads
-over a deep sine bass, a shimmer above them, wind, bells that ring out and, in two of its four parts, a slow
-arpeggio that runs against the bars, so that it never repeats in the same way. The third part rests on a held E.
+STILLWATER is the ambient one for long games: 64 bars (about 3:30) at 72 BPM without drums, all of it low and soft.
+Four long pads that swell in slowly, a quiet filtered synth bass whose pulse changes from part to part, a few
+discreet synth phrases, wind and, in the middle parts, a slow arpeggio that runs against the bars. The third part
+rests on a held E.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
