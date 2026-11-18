@@ -2,7 +2,8 @@
 
 ## 1.2
 
-- The fifth song is now DEEP FIELD, downtempo with ambient pads (about 3:10), instead of DRIFTWOOD.
+- The fifth song is now FAST LANE, a driving piece with four on the floor and a lead like a bass guitar, instead of
+  DRIFTWOOD.
 - Browser on phones and tablets: the first tap starts the sound of the intro (it stayed silent until the second tap).
 
 ## 1.1
