@@ -2,8 +2,7 @@
 
 ## 1.2
 
-- The fifth song is now AURORA, short electronic pop around one hook, with a bouncing synth bass, instead of
-  DRIFTWOOD.
+- The fifth song is now NIGHT DRIVE, calm synthwave with pads and a running arpeggio, instead of DRIFTWOOD.
 - Browser on phones and tablets: the first tap starts the sound of the intro (it stayed silent until the second tap).
 
 ## 1.1
