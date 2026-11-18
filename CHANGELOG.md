@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2
+
+- The fifth song is now STILLWATER, an ambient piece (about 3:40, no drums) instead of DRIFTWOOD.
+
 ## 1.1
 
 - New song: DRIFTWOOD, a calm and long piece (about 2:40, six parts) for long games.

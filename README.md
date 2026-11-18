@@ -67,12 +67,12 @@ chosen song in a loop (a little faster on higher levels), plus
 sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
 sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the five
 songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
-AFTERGLOW in [song4.txt](song4.txt), DRIFTWOOD in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
+AFTERGLOW in [song4.txt](song4.txt), STILLWATER in [song5.txt](song5.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
 music off and on at any time. The settings are remembered.
 
-DRIFTWOOD is the calm one for long games: 64 bars (about 2:40) at 96 BPM in six parts, an intro with pads, plucked
-arpeggios and bells, the theme with a soft beat, an interlude with a bell melody, a variation of the theme with
-the bells answering, a bridge in half time and an outro that leads back to the beginning.
+STILLWATER is the ambient one for long games: 64 bars (about 3:40) at 70 BPM without drums. Slowly swelling pads
+over a deep sine bass, a shimmer above them, wind, bells that ring out and, in two of its four parts, a slow
+arpeggio that runs against the bars, so that it never repeats in the same way. The third part rests on a held E.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
