@@ -2,8 +2,9 @@
 # Builds Shifty Bits for Linux: bin/shiftybits.
 #
 # MiniFB (window, keyboard, mouse) is built once from its sources into lib/linux/libminifb.a, at the version whose
-# headers are in include/. Needs git, cmake, a C compiler and the development files of X11, Xrandr, OpenGL and ALSA
-# (Debian/Ubuntu: sudo apt install git cmake build-essential libx11-dev libxrandr-dev libgl-dev libasound2-dev),
+# headers are in include/. Needs git, cmake, a C compiler and the development files of X11, Xrandr, xkbcommon, OpenGL and ALSA
+# (Debian/Ubuntu: sudo apt install git cmake build-essential libx11-dev libxrandr-dev libxkbcommon-dev libgl-dev
+# libasound2-dev),
 # and cshiftc on the PATH (or in $CSHIFTC).
 set -e
 cd "$(dirname "$0")/.."

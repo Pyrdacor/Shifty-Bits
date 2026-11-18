@@ -154,7 +154,7 @@ web/               index.html, shiftybits.js (host: canvas, keyboard, Web Audio)
 cshiftc build .        # -> bin/ShiftyBits.exe
 ```
 
-**Linux** (Debian/Ubuntu: `sudo apt install git cmake build-essential libx11-dev libxrandr-dev libgl-dev
+**Linux** (Debian/Ubuntu: `sudo apt install git cmake build-essential libx11-dev libxrandr-dev libxkbcommon-dev libgl-dev
 libasound2-dev`, plus what [CShift needs on Linux](https://github.com/Robert-Schneckenhaus/CShift)):
 
 ```sh
