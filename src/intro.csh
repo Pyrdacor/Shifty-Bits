@@ -113,6 +113,8 @@ struct Intro
         _DrawByline(t);
         _DrawScroller(t);
 
+        string version = "V" + GameVersion;
+        Gfx.TextShadow(ScreenW - 12 - Gfx.TextWidth(version, 2), ScreenH - 22, version, 2, Gfx.Rgb(200, 190, 230));
         string hint = Platform.SoundWaiting() ? "CLICK OR PRESS A KEY FOR SOUND     ESC: SKIP" : "CLICK OR PRESS ANY KEY TO SKIP";
         if (t > 1.5 && (int)(_time * 1.5) % 3 != 0)
             Gfx.TextCentered(ScreenW / 2, ScreenH - 22, hint, 2, Gfx.Rgb(200, 190, 230));

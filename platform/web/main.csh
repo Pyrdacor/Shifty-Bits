@@ -24,6 +24,7 @@ extern "C" void web_copy(char* text);
 extern "C" int web_paste(uint8* buffer, int size);
 extern "C" void web_download(char* name, uint8* data, int length);
 extern "C" void web_fullscreen();
+extern "C" void web_set_title(char* title);
 
 const int _ChunkSamples = 1024;
 
@@ -159,6 +160,8 @@ unsafe int Main()
     Render.Init();
     Music.Init(web_audio_rate());
     _audioChunk = (float*)Memory.Allocate(_ChunkSamples * sizeof(float));
+    string title = "Shifty Bits " + GameVersion;
+    web_set_title(title.CStr());
     Menu.Open();
     Intro.Start();
     web_set_frame(_Frame);

@@ -652,6 +652,8 @@ struct Render
         Gfx.FrameRect(x, y, w, h, 2, Gfx.Rgb(200, 160, 70));
         Gfx.TextCentered(ScreenW / 2, y + 22, "SHIFTY BITS", 6, gold);
         Gfx.TextCentered(ScreenW / 2, y + 78, "SELECT A GAME MODE", 2, dim);
+        string version = "V" + GameVersion;
+        Gfx.TextShadow(x + w - 16 - Gfx.TextWidth(version, 2), y + 12, version, 2, dim);
 
         int left = x + 44;
         int right = x + w - 44;

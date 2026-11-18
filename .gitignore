@@ -5,3 +5,6 @@ web/shiftybits.wasm
 # player data written by the game
 shiftybits-best.txt
 screenshots/
+
+# built by tools/build-linux.sh
+lib/linux/

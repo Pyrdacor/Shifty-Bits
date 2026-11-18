@@ -1,0 +1,10 @@
+{
+	"name": "ShiftyBits",
+	"version": "1.0.0",
+	"type": "executable",
+	"sources": ["../../src", "../native", "."],
+	"output": "../../bin/shiftybits",
+	"optimize": 2,
+	"includePaths": ["../../include"],
+	"links": ["../../lib/linux/libminifb.a", "X11", "Xrandr", "GL", "asound", "stdc++", "m"]
+}

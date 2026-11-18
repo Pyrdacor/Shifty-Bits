@@ -1,0 +1,196 @@
+# Builds Shifty Bits for Windows, Linux and the browser and publishes the three as a GitHub release.
+#
+# A release is made by pushing a tag `v<version>`, where the version is `GameVersion` in src/version.csh:
+#   git tag v1.0 && git push origin v1.0
+# Started by hand (workflow_dispatch), it only builds and keeps the packages as artifacts of the run, to try a build
+# before tagging it.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # the CShift release the game is built with (https://github.com/Robert-Schneckenhaus/CShift/releases)
+  CSHIFT_VERSION: "0.32"
+  # the MiniFB commit whose headers are in include/ (Linux builds MiniFB from its sources, see tools/build-linux.sh)
+  MINIFB_COMMIT: 3cece1f72d1e43742051d114d36bded76e1327be
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read the version and check it against the tag
+        id: version
+        run: |
+          version=$(sed -n 's/^const string GameVersion = "\(.*\)";/\1/p' src/version.csh)
+          if [ -z "$version" ]; then
+            echo "::error::GameVersion not found in src/version.csh"
+            exit 1
+          fi
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::The tag $GITHUB_REF_NAME does not match GameVersion $version in src/version.csh"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  windows:
+    needs: version
+    runs-on: windows-latest
+    env:
+      PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-windows-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the CShift compiler
+        shell: pwsh
+        run: |
+          $zip = "$env:RUNNER_TEMP\cshift.zip"
+          Invoke-WebRequest "https://github.com/Robert-Schneckenhaus/CShift/releases/download/v$env:CSHIFT_VERSION/cshift-$env:CSHIFT_VERSION-windows-x64.zip" -OutFile $zip
+          Expand-Archive $zip -DestinationPath $env:RUNNER_TEMP
+          "$env:RUNNER_TEMP\cshift-$env:CSHIFT_VERSION-windows-x64" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      - name: Build
+        shell: pwsh
+        run: |
+          cshiftc --version
+          cshiftc build .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      # the test mode renders an image without a window: the program starts and draws
+      - name: Test
+        shell: pwsh
+        run: |
+          foreach ($mode in 'intro', 'pointer') {
+            $p = Start-Process bin\ShiftyBits.exe -ArgumentList '--shot', "$mode.png", $mode -Wait -PassThru -NoNewWindow
+            if ($p.ExitCode -ne 0) { throw "--shot $mode failed with $($p.ExitCode)" }
+            if (-not (Test-Path "$mode.png")) { throw "--shot $mode wrote no image" }
+          }
+
+      - name: Package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory "$env:PACKAGE" | Out-Null
+          Copy-Item bin\ShiftyBits.exe, README.md "$env:PACKAGE\"
+          Copy-Item include\LICENSE-MiniFB "$env:PACKAGE\LICENSE-MiniFB.txt"
+          Compress-Archive "$env:PACKAGE" "$env:PACKAGE.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: ${{ env.PACKAGE }}.zip
+
+  linux:
+    needs: version
+    # the oldest supported Ubuntu: the program then runs on every distribution with that glibc or a newer one
+    runs-on: ubuntu-22.04
+    env:
+      PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-linux-x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libffi8 libedit2 libz3-4 zlib1g libzstd1 libxml2 \
+            libx11-dev libxrandr-dev libgl-dev libasound2-dev
+
+      - name: Install the CShift compiler
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cshift.tar.xz" \
+            "https://github.com/Robert-Schneckenhaus/CShift/releases/download/v$CSHIFT_VERSION/cshift-$CSHIFT_VERSION-linux-x64.tar.xz"
+          tar -xf "$RUNNER_TEMP/cshift.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cshift-$CSHIFT_VERSION-linux-x64" >> "$GITHUB_PATH"
+
+      - name: Build
+        run: |
+          grep -q "MINIFB_COMMIT=$MINIFB_COMMIT" tools/build-linux.sh
+          cshiftc --version
+          tools/build-linux.sh
+
+      - name: Test
+        run: |
+          bin/shiftybits --shot intro.png intro
+          bin/shiftybits --shot pointer.png pointer
+          test -f intro.png
+          ldd bin/shiftybits
+
+      - name: Package
+        run: |
+          mkdir "$PACKAGE"
+          cp bin/shiftybits README.md "$PACKAGE/"
+          cp include/LICENSE-MiniFB "$PACKAGE/LICENSE-MiniFB.txt"
+          tar -czf "$PACKAGE.tar.gz" "$PACKAGE"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: ${{ env.PACKAGE }}.tar.gz
+
+  web:
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the CShift compiler
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cshift.tar.xz" \
+            "https://github.com/Robert-Schneckenhaus/CShift/releases/download/v$CSHIFT_VERSION/cshift-$CSHIFT_VERSION-linux-x64.tar.xz"
+          tar -xf "$RUNNER_TEMP/cshift.tar.xz" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/cshift-$CSHIFT_VERSION-linux-x64" >> "$GITHUB_PATH"
+
+      - name: Build and package
+        run: |
+          cshiftc build web
+          mkdir "$PACKAGE"
+          cp web/index.html web/shiftybits.js web/shiftybits.wasm web/serve.mjs "$PACKAGE/"
+          zip -r "$PACKAGE.zip" "$PACKAGE"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: ${{ env.PACKAGE }}.zip
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: [version, windows, linux, web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: packages
+          merge-multiple: true
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > notes.md <<EOF
+          Shifty Bits $VERSION, the bit rolling puzzle game.
+
+          | Package | |
+          |---|---|
+          | \`ShiftyBits-$VERSION-windows-x64.zip\` | Windows 10/11 (64 bit): unpack and start \`ShiftyBits.exe\` |
+          | \`ShiftyBits-$VERSION-linux-x64.tar.gz\` | Linux (64 bit, glibc 2.35 or newer, e.g. Ubuntu 22.04+, Debian 12+): unpack and start \`shiftybits\`. Needs X11 (or XWayland), OpenGL and ALSA, which a desktop has; copying and pasting the seed uses \`wl-copy\`, \`xclip\` or \`xsel\` if one is installed |
+          | \`ShiftyBits-$VERSION-web.zip\` | The browser version to host yourself (\`node serve.mjs\` serves it locally) |
+
+          Or play it in the browser: https://pyrdacor.github.io/Shifty-Bits/
+
+          The best values, the settings and the screenshots are kept in the folder the game is started in.
+          EOF
+          gh release create "$GITHUB_REF_NAME" packages/* --repo "$GITHUB_REPOSITORY" --title "Shifty Bits $VERSION" --notes-file notes.md

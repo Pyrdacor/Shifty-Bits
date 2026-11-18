@@ -140,17 +140,34 @@ Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font
 src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
 song*.txt          the four songs, embedded by the game and edited with tools/musiceditor
 intro.txt          the song of the intro (the same format)
-platform/native/   desktop: MiniFB window, winmm sound (audio.csh), files; testing.csh writes test images and music
-tools/musiceditor/ the music editor (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
+platform/native/   desktop (Windows and Linux): MiniFB window, files; testing.csh writes test images and music
+platform/windows/  Windows: winmm sound (audio.csh), clipboard
+platform/linux/    Linux: ALSA sound (audio.csh), clipboard (wl-copy, xclip or xsel), its project file cshift.json
+tools/musiceditor/ the music editor for Windows (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
 platform/web/      browser: imports from web/shiftybits.js
 web/               index.html, shiftybits.js (host: canvas, keyboard, Web Audio), serve.mjs, cshift.json
 ```
 
-**Desktop:**
+**Windows:**
 
 ```sh
 cshiftc build .        # -> bin/ShiftyBits.exe
 ```
+
+**Linux** (Debian/Ubuntu: `sudo apt install git cmake build-essential libx11-dev libxrandr-dev libgl-dev
+libasound2-dev`, plus what [CShift needs on Linux](https://github.com/Robert-Schneckenhaus/CShift)):
+
+```sh
+tools/build-linux.sh   # -> bin/shiftybits; builds MiniFB into lib/linux/ the first time
+```
+
+The version is `GameVersion` in [src/version.csh](src/version.csh); it is shown in the title bar, in the menu and in
+the intro.
+
+**Releases:** pushing a tag `v<version>` (matching `GameVersion`) starts
+[.github/workflows/release.yml](.github/workflows/release.yml): it builds and tests the Windows, Linux and browser
+versions and publishes them as a GitHub release (`ShiftyBits-<version>-windows-x64.zip`, `-linux-x64.tar.gz`,
+`-web.zip`). Started by hand, the workflow only builds and keeps the packages as artifacts of the run.
 
 **Browser** (CShift's own wasm backend, no other tools needed):
 
@@ -171,5 +188,5 @@ with the first key press or click (browsers only allow sound after one). In the 
 
 `ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro]` plays a few automatic moves and renders
 one image;
-`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2`, `music3` and `music4` the other songs, `sounds` only the
+`ShiftyBits.exe --shot music.wav music` renders 40 seconds of music, `music2`, `music3` and `music4` the other songs, `intromusic` the intro's song, `sounds` only the
 sound effects (all for testing).

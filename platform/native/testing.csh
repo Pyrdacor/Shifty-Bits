@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|intro|countdown|score|nonzero|alternate|music|level2..level20]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|intro|countdown|score|nonzero|alternate|music|intromusic|level2..level20]`).
 
 namespace ShiftyBits;
 
@@ -20,6 +20,13 @@ struct TestOutput
         {
             // the other built-in songs
             Music.SelectSong(mode == "music2" ? 1 : mode == "music3" ? 2 : 3);
+            return _MusicWav(path);
+        }
+        if (mode == "intromusic")
+        {
+            // the song of the intro, without sound effects
+            Music.LoadSong(_IntroSongLines);
+            Music.SetSoundsOn(false);
             return _MusicWav(path);
         }
         if (mode == "music" || mode == "sounds")

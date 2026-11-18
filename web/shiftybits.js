@@ -316,6 +316,12 @@ const env = {
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
   },
   web_fullscreen() { toggleFullscreen(); },
+  web_set_title(ptr) {
+    const bytes = new Uint8Array(memory.buffer);
+    let end = ptr;
+    while (bytes[end]) end++;
+    document.title = decoder.decode(bytes.subarray(ptr, end));
+  },
 };
 
 // ---- start ----

@@ -6,7 +6,7 @@ bars 24
 
 track LEAD
 wave pulse
-volume 0.07
+volume 0.1
 attack 0.003
 decay 0.25
 sustain 0.6
@@ -48,7 +48,7 @@ follow 0
 
 track LEAD HIGH
 wave triangle
-volume 0.03
+volume 0.045
 attack 0.003
 decay 0.2
 sustain 0.5
@@ -66,7 +66,7 @@ follow 1
 
 track ARP
 wave square
-volume 0.04
+volume 0.055
 attack 0.002
 decay 0.07
 sustain 0
@@ -108,7 +108,7 @@ follow 0
 
 track BASS
 wave saw
-volume 0.16
+volume 0.22
 attack 0.002
 decay 0.18
 sustain 0.35
@@ -150,7 +150,7 @@ follow 0
 
 track KICK
 wave sine
-volume 0.32
+volume 0.42
 attack 0.001
 decay 0.12
 sustain 0
@@ -192,7 +192,7 @@ follow 0
 
 track SNARE
 wave noise
-volume 0.08
+volume 0.11
 attack 0.001
 decay 0.11
 sustain 0
@@ -234,7 +234,7 @@ follow 0
 
 track HIHAT
 wave noise
-volume 0.03
+volume 0.042
 attack 0.001
 decay 0.03
 sustain 0

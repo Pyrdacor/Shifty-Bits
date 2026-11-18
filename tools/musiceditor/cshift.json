@@ -8,7 +8,7 @@
 		"../../src/screenshot.csh",
 		"../../src/song.csh",
 		"../../src/music.csh",
-		"../../platform/native/audio.csh"
+		"../../platform/windows/audio.csh"
 	],
 	"output": "bin/MusicEditor",
 	"optimize": 2,

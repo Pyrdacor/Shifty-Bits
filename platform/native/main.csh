@@ -1,5 +1,5 @@
-//! Shifty Bits on the desktop: window and keyboard via MiniFB, sound via winmm (audio.csh), the Windows clipboard for the
-//! seed, files for the best values and the screenshots.
+//! Shifty Bits on the desktop (Windows and Linux): window, keyboard and mouse via MiniFB, files for the best values and
+//! the screenshots. The sound (`Audio`) and the clipboard (`Clipboard`) come from platform/windows or platform/linux.
 
 namespace ShiftyBits;
 
@@ -7,18 +7,6 @@ using System;
 using Mfb from "MiniFB.h";
 
 const string _BestFile = "shiftybits-best.txt";
-
-const uint32 _CfText = 1;
-const uint32 _GmemMoveable = 2;
-
-extern "C" int OpenClipboard(void* owner);
-extern "C" int CloseClipboard();
-extern "C" int EmptyClipboard();
-extern "C" void* GetClipboardData(uint32 format);
-extern "C" void* SetClipboardData(uint32 format, void* memory);
-extern "C" void* GlobalAlloc(uint32 flags, nuint bytes);
-extern "C" void* GlobalLock(void* memory);
-extern "C" int GlobalUnlock(void* memory);
 
 bool _fullscreen;
 bool _toggleFullscreen;
@@ -96,45 +84,15 @@ struct Platform
     }
 
     /// Puts `text` on the clipboard.
-    static unsafe void CopyText(string text)
+    static void CopyText(string text)
     {
-        if (OpenClipboard(null) == 0)
-            return;
-        EmptyClipboard();
-        void* memory = GlobalAlloc(_GmemMoveable, (nuint)(text.Length + 1));
-        if (memory != null)
-        {
-            uint8* p = (uint8*)GlobalLock(memory);
-            for (var i = 0; i < text.Length; i += 1)
-            {
-                p[i] = (uint8)text[i];
-            }
-            p[text.Length] = 0;
-            GlobalUnlock(memory);
-            // the clipboard owns the memory from here on
-            SetClipboardData(_CfText, memory);
-        }
-        CloseClipboard();
+        Clipboard.Copy(text);
     }
 
     /// The text on the clipboard ("" if there is none).
-    static unsafe string PasteText()
+    static string PasteText()
     {
-        if (OpenClipboard(null) == 0)
-            return "";
-        string text = "";
-        void* memory = GetClipboardData(_CfText);
-        if (memory != null)
-        {
-            char* p = (char*)GlobalLock(memory);
-            if (p != null)
-            {
-                text = string.FromCStr(p);
-                GlobalUnlock(memory);
-            }
-        }
-        CloseClipboard();
-        return text;
+        return Clipboard.Paste();
     }
 
     /// Stores a screenshot and returns the message for the player.
@@ -200,10 +158,11 @@ bool OnClose(Mfb.mfb_window* window)
 }
 
 // opens the game window, either as a window or as a borderless fullscreen window with the image scaled to fit
-Mfb.mfb_window* _OpenWindow()
+unsafe Mfb.mfb_window* _OpenWindow()
 {
     uint32 flags = _fullscreen ? (uint32)Mfb.MFB_WF_FULLSCREEN_DESKTOP : 0u;
-    var window = Mfb.mfb_open_ex("Shifty Bits", (uint32)ScreenW, (uint32)ScreenH, flags);
+    string title = "Shifty Bits " + GameVersion;
+    var window = Mfb.mfb_open_ex(title.CStr(), (uint32)ScreenW, (uint32)ScreenH, flags);
     if (window == null)
         return window;
     Mfb.mfb_set_keyboard_callback(window, OnKey);
