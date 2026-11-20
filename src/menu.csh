@@ -19,11 +19,12 @@ const int _ElSeed = 5;
 const int _ElStart = 6;
 const int _ElNewSeed = 7;
 const int _ElIntro = 8;
-const int _ElHelp = 9;
-const int _ButtonCount = 4;
-const ReadOnlySlice<string> _ButtonLabels = ["START", "NEW SEED", "INTRO", "HELP"];
-const ReadOnlySlice<int> _ButtonOffsets = [24, 264, 464, 624];
-const ReadOnlySlice<int> _ButtonWidths = [230, 190, 150, 130];
+const int _ElAwards = 9;
+const int _ElHelp = 10;
+const int _ButtonCount = 5;
+const ReadOnlySlice<string> _ButtonLabels = ["START", "NEW SEED", "INTRO", "AWARDS", "HELP"];
+const ReadOnlySlice<int> _ButtonOffsets = [24, 210, 386, 512, 658];
+const ReadOnlySlice<int> _ButtonWidths = [180, 170, 120, 140, 98];
 
 const int MenuW = 780;
 // the height with the option row; without it, the rows below move up and the menu gets shorter (its top stays, so
@@ -81,7 +82,10 @@ struct Menu
             _settingsLoaded = true;
             // a phone or tablet starts with the buttons
             _pointerMode = Platform.IsTouch();
+            Achievements.Load();
         }
+        // a game left with Esc: its cleared tiles count
+        Achievements.Save();
         _state = State.Menu;
         _paused = false;
         _menuRow = _RowMode;
@@ -327,6 +331,8 @@ struct Menu
             _RandomSeed();
         else if (element == _ElIntro)
             Intro.Start();
+        else if (element == _ElAwards)
+            _showAwards = true;
         else if (element == _ElHelp)
             _showHelp = true;
     }

@@ -1,5 +1,5 @@
 //! Test output without a window: a rendered screenshot or a WAV file of the music
-//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|intro|countdown|score|nonzero|alternate|music|intromusic|level2..level20]`).
+//! (`ShiftyBits.exe --shot <file> [play|over|help|menu|pointer|intro|awards|countdown|score|nonzero|alternate|music|intromusic|level2..level20]`).
 
 namespace ShiftyBits;
 
@@ -37,6 +37,16 @@ struct TestOutput
         }
         Menu.Open();
         _seed = 12345;
+        if (mode == "awards")
+        {
+            // the list of the achievements, with a few of them reached (the secret one among them)
+            _achieved = (1 << 0) | (1 << 1) | (1 << 5) | (1 << 6) | (1 << 14) | (1 << 17) | (1 << AchSecret) | (1 << AchIntro);
+            _showAwards = true;
+            Render.Frame();
+            if (File.WriteAllBytes(path, Screenshot.Encode()) is error ae)
+                return 1;
+            return 0;
+        }
         if (mode == "intro")
         {
             // the intro after 20 seconds, with the title, the scroller and a zooming word

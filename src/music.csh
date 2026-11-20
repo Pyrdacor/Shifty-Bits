@@ -13,6 +13,7 @@ enum Sfx : uint8
     Clear,
     LevelUp,
     GameOver,
+    Achievement,
 }
 
 const int _VoiceCount = 32;
@@ -291,6 +292,17 @@ struct Music
                 for (var i = 0; i < notes.Length; i += 1)
                 {
                     _Later(i * 70, notes[i], _Fanfare);
+                }
+                break;
+            }
+            case Sfx.Achievement:
+            {
+                // a bright chord in C major, which fits the songs and the other sounds
+                ReadOnlySlice<int> notes = [72, 76, 79, 84];
+                for (var i = 0; i < notes.Length; i += 1)
+                {
+                    _Later(i * 45, notes[i], _ChimeShine);
+                    _Later(i * 45, notes[i] - 12, _Chime);
                 }
                 break;
             }

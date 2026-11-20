@@ -62,9 +62,10 @@ struct Input
             Render.Toast(Music.IsOn() ? "MUSIC ON" : "MUSIC OFF");
             return;
         }
-        if (_showHelp)
+        if (_showHelp || _showAwards)
         {
             _showHelp = false;
+            _showAwards = false;
             return;
         }
         if (_state == State.Menu)
@@ -120,8 +121,11 @@ struct Input
     {
         if (_state == State.Intro)
             Intro.Input();
-        else if (_showHelp)
+        else if (_showHelp || _showAwards)
+        {
             _showHelp = false;
+            _showAwards = false;
+        }
         else if (_state == State.Menu)
             Menu.Pointer(x, y);
     }

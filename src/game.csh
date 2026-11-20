@@ -35,9 +35,15 @@ const int ModeCount = 5;
 /// Where the settings are kept, after the best values of the first modes: bit 0 set means music off, bit 1 sound
 /// effects off, bits 2 to 4 are the number of the song.
 const int SettingsSlot = 10;
-/// The number of values the platform stores: the best value of every mode and option (see `Game.BestSlot`) and the
-/// settings.
-const int StoredSlots = 12;
+/// Where the reached achievements are kept, one bit each.
+const int AchievementSlot = 12;
+/// Where the progress of the achievements for all songs and all modes is kept.
+const int AchievementProgressSlot = 13;
+/// Where the number of tiles cleared in all games is kept.
+const int TotalTilesSlot = 14;
+/// The number of values the platform stores: the best value of every mode and option (see `Game.BestSlot`), the
+/// settings and the achievements.
+const int StoredSlots = 15;
 /// The largest seed (9 digits).
 const int MaxSeed = 999999999;
 /// The seed of the easter egg: "PYRDACOR" typed on the keys of a phone (P 7, Y 9, R 7, D 3, A 2, C 2, O 6, R 7).
@@ -321,6 +327,7 @@ struct Game
         Music.Start();
         _next = _RandomPiece();
         _Spawn();
+        Achievements.GameStarted();
     }
 
     /// The cell value at (`x`, `y`): -1 empty, else the bit.
@@ -414,6 +421,7 @@ struct Game
     {
         _time += dt;
         _UpdateEffects(dt);
+        Achievements.Update();
         if (_state == State.Intro)
         {
             Intro.Update(dt);
@@ -477,6 +485,8 @@ struct Game
         {
             _best = Math.Max(_best, _score);
         }
+        if (_state != State.GameOver)
+            Achievements.CheckGame();
     }
 
     static bool _CanControl()
@@ -678,6 +688,7 @@ struct Game
                 return true;
             }
             _nextBit = 1 - bit;
+            Achievements.Switched();
         }
 
         for (var i = 0; i < _clearing.Length; i += 1)
@@ -691,6 +702,7 @@ struct Game
         }
         _chain += 1;
         _bestChain = Math.Max(_bestChain, _chain);
+        Achievements.Cleared(marked, zeros, ones, _chain);
         // several runs at once and chain reactions multiply
         int total = points * runs * _chain * _level;
         _score += total;
@@ -765,6 +777,8 @@ struct Game
     // ends the game and keeps a new best value
     static void _Finish(End end)
     {
+        Achievements.CheckGame();
+        Achievements.Save();
         _state = State.GameOver;
         _end = end;
         Music.Stop();

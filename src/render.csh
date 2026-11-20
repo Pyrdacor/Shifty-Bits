@@ -170,6 +170,8 @@ struct Render
             _DrawGame();
         if (_showHelp)
             _DrawHelp();
+        else if (_showAwards)
+            Achievements.Draw();
         if (!_capturing && _toast.Length > 0 && _time - _toastTime < _ToastSeconds)
         {
             Gfx.BlendRect(0, ScreenH - 40, ScreenW, 32, Gfx.Rgb(6, 8, 20), 200);

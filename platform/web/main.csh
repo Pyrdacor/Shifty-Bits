@@ -127,7 +127,7 @@ unsafe void _Frame(double dt)
     int state = 1;
     if (_state == State.Intro)
         state = 5;
-    else if (_showHelp)
+    else if (_showHelp || _showAwards)
         state = 4;
     else if (_state == State.Menu)
         state = 0;
@@ -137,7 +137,7 @@ unsafe void _Frame(double dt)
         state = 2;
     web_state(state);
     // where a tap opens the on-screen keyboard for the seed: only in the menu
-    if (_state == State.Menu && !_showHelp)
+    if (_state == State.Menu && !_showHelp && !_showAwards)
         web_seed_rect(MenuSeedX, Menu.SeedY(), MenuSeedW, MenuSeedH);
     else
         web_seed_rect(0, 0, 0, 0);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3
+
+- Achievements: 30 goals, listed under AWARDS in the menu and announced in the game when they are reached.
+
 ## 1.2
 
 - DRIFTWOOD, the fifth song of 1.1, is gone again: back to the four songs.

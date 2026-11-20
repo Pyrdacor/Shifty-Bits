@@ -29,7 +29,7 @@ of the menu (or **I**) shows it again.
 
 The menu chooses the game mode with a selector (Left/Right or a click on its left or right half). The countdown and
 score modes have an option below it (the minutes or the target score); for the other modes that row is hidden.
-Below them are MUSIC and SOUNDS, the seed and the buttons START, NEW SEED, INTRO and HELP. Up/Down moves between the
+Below them are MUSIC and SOUNDS, the seed and the buttons START, NEW SEED, INTRO, AWARDS and HELP. Up/Down moves between the
 rows, Left/Right changes the value or the button, Enter starts the game from the mode and option rows and presses the
 selected button in the button row.
 
@@ -110,6 +110,17 @@ the folder it is started in, so a saved song can be heard in the game at its nex
 version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
 the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
 
+## Achievements
+
+AWARDS in the menu lists 30 achievements, each with its symbol and a short description: the reached ones in color
+and at the top, the others grey (one stays a secret until it is found). A newly reached one is announced at the
+bottom of the screen with a chime. They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs that dissolve
+together count), 0s and 1s at once, 5000 to 300000 points, 1000 points with every song and in every mode, chain
+reactions of 2, 3 and 4, levels 5, 10 and 20, 1000 and 10000 cleared bits in all, 10 minutes in one game, 10000 points
+in the 1-minute countdown, 10000 points in the score mode within 3 minutes, 5000 points in the non-zero mode, 20
+switches in the alternate mode, and watching the whole intro. They are kept with the best values (three more lines
+in `shiftybits-best.txt`, in the browser in `localStorage`).
+
 ## Controls
 
 | Key | Action |
@@ -187,7 +198,7 @@ released. JavaScript then calls the frame function through the function table on
 with the first key press or click (browsers only allow sound after one). In the browser the best values are kept in
 `localStorage` and a screenshot is downloaded.
 
-`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro]` plays a few automatic moves and renders
+`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro|awards]` plays a few automatic moves and renders
 one image;
 `ShiftyBits.exe --shot music.wav music` renders the song once through (at least 40 seconds), `music2` to `music4` the other songs, `intromusic` the intro's song, `sounds` only the
 sound effects (all for testing).

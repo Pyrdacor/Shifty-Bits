@@ -91,7 +91,10 @@ struct Intro
     {
         _introTime += dt;
         if (_introTime >= _IntroEnd + _IntroFadeOut)
+        {
+            Achievements.Unlock(AchIntro);
             Skip();
+        }
     }
 
     /// Draws a frame of the intro.
