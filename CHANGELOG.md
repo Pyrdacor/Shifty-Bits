@@ -3,6 +3,8 @@
 ## 1.3
 
 - Achievements: 30 goals, listed under AWARDS in the menu and announced in the game when they are reached.
+- Non-zero mode: no more blocks with a row or column of four zeros (they ended the game wherever they landed), and
+  a few more 1s (55 %). The other modes keep the blocks of their seeds.
 
 ## 1.2
 

@@ -552,9 +552,44 @@ struct Game
         var bits = new int[pw * ph];
         for (var i = 0; i < bits.Length; i += 1)
         {
-            bits[i] = rng.Next(0, 2);
+            // in the non-zero mode a few more 1s; the other modes keep the blocks of their seeds as they were
+            bits[i] = _mode == Mode.NonZero ? (rng.Next(0, 100) < 55 ? 1 : 0) : rng.Next(0, 2);
         }
+        if (_mode == Mode.NonZero)
+            _BreakZeroRuns(bits, pw, ph, rng);
         return Piece { W = pw, H = ph, Bits = bits };
+    }
+
+    // In the non-zero mode a block must not hold 4 zeros in a row: rolling only moves the bits along their row or
+    // column, so such a block would end the game wherever it lands. One zero of such a row or column becomes a 1.
+    static void _BreakZeroRuns(int[] bits, int w, int h, Random rng)
+    {
+        if (w >= _RunLength)
+        {
+            for (var r = 0; r < h; r += 1)
+            {
+                bool zeros = true;
+                for (var c = 0; c < w; c += 1)
+                {
+                    zeros = zeros && bits[r * w + c] == 0;
+                }
+                if (zeros)
+                    bits[r * w + rng.Next(0, w)] = 1;
+            }
+        }
+        if (h >= _RunLength)
+        {
+            for (var c = 0; c < w; c += 1)
+            {
+                bool zeros = true;
+                for (var r = 0; r < h; r += 1)
+                {
+                    zeros = zeros && bits[r * w + c] == 0;
+                }
+                if (zeros)
+                    bits[rng.Next(0, h) * w + c] = 1;
+            }
+        }
     }
 
     static void _Spawn()

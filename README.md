@@ -49,7 +49,7 @@ them.
 | Normal | Play until the well is full. |
 | Countdown | 1, 3, 5 or 10 minutes: the most points before the time runs out. A chain reaction that is still running at 0:00 is finished and counts. |
 | Score | Reach 1000, 10000, 50000 or 100000 points in the shortest time. The clock stops when the target is reached; a full well ends the game without a time. |
-| Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. |
+| Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. The blocks hold a few more 1s (55 %), and none has a row or column of four zeros, which no rolling could save. |
 | Alternate | The rules of the normal mode, but 1s and 0s must be cleared in turn; either may come first. Clearing 1s and 0s at the same time is always allowed and keeps the turn (after it, the same bit is due again). Clearing the bit that is not due ends the game; every step of a chain reaction counts. The left panel shows which bit is due next. |
 
 Every mode and option has its own best value (a score, or a time in the score mode), kept in `shiftybits-best.txt`
