@@ -145,7 +145,7 @@ tools/musiceditor/ the music editor for Windows (shares gfx.csh, song.csh, music
 tools/build-linux.sh  builds MiniFB for Linux (into lib/linux/) and the Linux version
 platform/web/      browser: imports from web/shiftybits.js
 web/               index.html, shiftybits.js (host: canvas, keyboard, Web Audio), serve.mjs, cshift.json
-docs/screenshots/  the pictures of this README (rendered by the Windows version in the test mode)
+docs/screenshots/  the pictures of this README (rendered by the game in its test mode: --shot intro, menu, play, awards)
 .github/workflows/ pages.yml (the browser version on GitHub Pages), release.yml (the releases)
 ```
 
