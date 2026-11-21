@@ -235,7 +235,7 @@ jobs:
           # the section of CHANGELOG.md for this version, if it has one
           awk -v v="## $VERSION" '$0 == v { on = 1; next } /^## / { on = 0 } on' CHANGELOG.md > changes.md
           cat > notes.md <<EOF
-          Shifty Bits $VERSION, the bit rolling puzzle game.
+          Shifty Bits $VERSION, the bit shifting puzzle game.
 
           $(cat changes.md)
 
@@ -250,10 +250,11 @@ jobs:
           The best values, the settings and the screenshots are kept in the folder the game is started in.
           EOF
           # for a pushed tag that tag; started by hand, the tag of the version is created on the commit that was built.
-          # A release of this version that exists already gets the packages added (or replaced).
+          # A release of this version that exists already gets the packages added (or replaced) and its notes renewed.
           tag="v$VERSION"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release upload "$tag" packages/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
           else
             gh release create "$tag" packages/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Shifty Bits $VERSION" --notes-file notes.md
           fi
