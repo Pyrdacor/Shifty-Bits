@@ -36,13 +36,13 @@ const ReadOnlySlice<uint32> _TileColors = [
 
 // the key list of the side panel and of the help screen: key, then what it does
 const ReadOnlySlice<string> _PanelKeys = [
-    "← →", "MOVE", "A D", "ROLL ←→", "W S", "ROLL ↑↓", "↓", "FASTER", "SPACE", "DROP",
+    "← →", "MOVE", "A D", "SHIFT ←→", "W S", "SHIFT ↑↓", "↓", "FASTER", "SPACE", "DROP",
     "P", "PAUSE", "H", "HELP", "R", "RESTART", "F11", "FULLSCREEN", "M", "MUSIC", "ESC", "MENU",
 ];
 const ReadOnlySlice<string> _HelpKeys = [
     "← →", "MOVE THE BLOCK",
-    "A / D  (Z / X)", "ROLL ALL ROWS LEFT / RIGHT",
-    "W / S  (↑)", "ROLL ALL COLUMNS UP / DOWN",
+    "A / D  (Z / X)", "SHIFT ALL ROWS LEFT / RIGHT",
+    "W / S  (↑)", "SHIFT ALL COLUMNS UP / DOWN",
     "↓  /  SPACE", "FASTER  /  DROP",
     "P  R  ESC", "PAUSE  RESTART  MENU",
     "F11 / ALT+ENTER", "FULLSCREEN ON / OFF",
