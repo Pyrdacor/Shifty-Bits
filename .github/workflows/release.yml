@@ -81,6 +81,44 @@ jobs:
             if (-not (Test-Path "$mode.png")) { throw "--shot $mode wrote no image" }
           }
 
+      # pictures of the Windows version: the screens of the test mode, then the real window, photographed from the
+      # desktop of the runner (that part may fail where the runner has no desktop, which does not stop the release)
+      - name: Screenshots
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          New-Item -ItemType Directory shots | Out-Null
+          foreach ($mode in 'intro', 'menu', 'play', 'alternate', 'awards', 'over') {
+            Start-Process bin\ShiftyBits.exe -ArgumentList '--shot', "shots\$mode.png", $mode -Wait -NoNewWindow
+          }
+          Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+          function Save-Screen([string]$name) {
+            $bounds = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
+            $bitmap = New-Object System.Drawing.Bitmap $bounds.Width, $bounds.Height
+            $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+            $graphics.CopyFromScreen($bounds.Location, [System.Drawing.Point]::Empty, $bounds.Size)
+            $bitmap.Save("shots\$name.png")
+          }
+          $game = Start-Process bin\ShiftyBits.exe -PassThru
+          Start-Sleep -Seconds 8
+          Save-Screen 'window-intro'
+          $shell = New-Object -ComObject WScript.Shell
+          $null = $shell.AppActivate($game.Id)
+          [System.Windows.Forms.SendKeys]::SendWait('{ESC}')
+          Start-Sleep -Seconds 2
+          Save-Screen 'window-menu'
+          [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
+          Start-Sleep -Seconds 4
+          Save-Screen 'window-game'
+          Stop-Process -Id $game.Id -ErrorAction SilentlyContinue
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-screenshots
+          path: shots/
+          if-no-files-found: ignore
+
       - name: Package
         shell: pwsh
         run: |
@@ -91,7 +129,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: windows
+          name: package-windows
           path: ${{ env.PACKAGE }}.zip
 
   linux:
@@ -138,7 +176,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: package-linux
           path: ${{ env.PACKAGE }}.tar.gz
 
   web:
@@ -165,7 +203,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: web
+          name: package-web
           path: ${{ env.PACKAGE }}.zip
 
   release:
@@ -182,6 +220,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: packages
+          pattern: package-*
           merge-multiple: true
 
       - name: Publish the release
