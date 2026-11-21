@@ -2,10 +2,12 @@
 
 **[Play it in the browser](https://pyrdacor.github.io/Shifty-Bits/)**
 
-| | |
-|---|---|
-| ![The intro: copper bars, mountains and chains of bits](docs/screenshots/intro.png) | ![The menu](docs/screenshots/menu.png) |
-| ![A game, with an achievement announced at the right](docs/screenshots/play.png) | ![The list of the achievements](docs/screenshots/awards.png) |
+<p>
+  <img src="docs/screenshots/intro.png" width="49%" alt="The intro: copper bars, mountains and chains of bits">
+  <img src="docs/screenshots/menu.png" width="49%" alt="The menu">
+  <img src="docs/screenshots/play.png" width="49%" alt="A game, with an achievement announced at the right">
+  <img src="docs/screenshots/awards.png" width="49%" alt="The list of the achievements">
+</p>
 
 A falling-block puzzle written in CShift. Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
 every tile holds a 0 or a 1. You can **roll** a block: A/D rolls all rows left or right, W/S rolls all columns up or
@@ -46,8 +48,8 @@ of the menu (or **I**) shows it again.
 
 The menu chooses the game mode with a selector (Left/Right or a click on its left or right half). The countdown and
 score modes have an option below it (the minutes or the target score); for the other modes that row is hidden.
-Below them are MUSIC and SOUNDS, the seed and the buttons START, NEW SEED, INTRO, AWARDS and HELP. Up/Down moves between the
-rows, Left/Right changes the value or the button, Enter starts the game from the mode and option rows and presses the
+Below them are MUSIC and SOUNDS, the seed and the buttons START, NEW SEED, INTRO, AWARDS and HELP. Up/Down moves
+between the rows, Left/Right changes the value or the button, Enter starts the game from the mode and option rows and presses the
 selected button in the button row.
 
 The menu also works with the mouse and, in the browser, with a finger: a click or tap on a half of the mode or the
@@ -57,7 +59,7 @@ tap on the seed opens the on-screen keyboard to type one.
 **Touch controls:** on a phone or tablet the browser version shows buttons that send the keys of the keyboard
 controls: at the left moving (held buttons repeat), FASTER and DROP, at the right a cross that rolls the rows and
 columns, at the top PAUSE and fullscreen. While the game is paused or over, buttons for RESUME, NEW GAME,
-SCREENSHOT and MENU take their place. Held upright, the game is at the top and the buttons below it; lying, the buttons
+SCREENSHOT and MENU take their place (MENU asks first while a game is running, like the MENU button on the screen). Held upright, the game is at the top and the buttons below it; lying, the buttons
 are at the edges of the screen. `?touch=1` at the end of the address shows the buttons on any device, `?touch=0` hides
 them.
 
@@ -69,9 +71,10 @@ them.
 | Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. The blocks hold a few more 1s (55 %), and none has a row or column of four zeros, which no rolling could save. |
 | Alternate | The rules of the normal mode, but 1s and 0s must be cleared in turn; either may come first. Clearing 1s and 0s at the same time is always allowed and keeps the turn (after it, the same bit is due again). Clearing the bit that is not due ends the game; every step of a chain reaction counts. The left panel shows which bit is due next. |
 
-Every mode and option has its own best value (a score, or a time in the score mode), kept in `shiftybits-best.txt`
-(one line per mode and option of the first four modes, then one line with the music and sound settings, then the
-line of the alternate mode).
+Every mode and option has its own best value (a score, or a time in the score mode). The desktop version keeps them
+in `shiftybits-best.txt` in the folder it is started in: one line per mode and option of the first four modes, then
+one line with the music and sound settings and the chosen song, then the line of the alternate mode, then three lines
+for the achievements. The browser keeps the same values in `localStorage`.
 
 **Seed:** the blocks of a game come from its seed, a number of up to 9 digits: the same seed gives the same blocks
 (a block depends on the seed, its position in the sequence and the level at which it appears). Normally the seed is
@@ -81,11 +84,12 @@ the game and on the final screen, where Ctrl+C copies it as well.
 
 **Music and sound** come from a small synthesizer written in CShift ([src/music.csh](src/music.csh)): it plays the
 chosen song in a loop (a little faster on higher levels), plus
-sound effects for rolling, landing, clearing (higher with every chain step), level up and game over. Music and
-sound effects are set separately in the menu (the line below the modes): Enter on MUSIC goes through the four
+sound effects for rolling, landing, clearing (higher with every chain step), level up, game over and a reached
+achievement. Music and sound effects are set separately in the menu (the line below the game mode): Enter (or a click)
+on MUSIC goes through the four
 songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
-AFTERGLOW in [song4.txt](song4.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches the sound effects. **M** switches the
-music off and on at any time. The settings are remembered.
+AFTERGLOW in [song4.txt](song4.txt)) and then to OFF, and the chosen song starts playing; Enter on SOUNDS switches
+the sound effects. **M** switches the music off and on at any time. The settings are remembered.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
@@ -94,12 +98,11 @@ After a game, **S** (or F12) saves a screenshot of the final screen, with the da
 
 AWARDS in the menu lists 30 achievements, each with its symbol and a short description: the reached ones in color
 and at the top, the others grey (one stays a secret until it is found). A newly reached one is announced with a chime,
-in a game below the panel at the right (off the well). They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs that dissolve
-together count), 0s and 1s at once, 5000 to 300000 points, 1000 points with every song and in every mode, chain
+in a game below the panel at the right (off the well). They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs
+that dissolve together count), 0s and 1s at once, 5000 to 300000 points, 1000 points with every song and in every mode, chain
 reactions of 2, 3 and 4, levels 5, 10 and 20, 1000 and 10000 cleared bits in all, 10 minutes in one game, 2500 points
 in the 1-minute countdown, 10000 points in the score mode within 3 minutes, 1500 points in the non-zero mode, 25
-switches in the alternate mode, and watching the whole intro. They are kept with the best values (three more lines
-in `shiftybits-best.txt`, in the browser in `localStorage`).
+switches in the alternate mode, and watching the whole intro. They are kept with the best values.
 
 ## Controls
 
@@ -109,12 +112,12 @@ question is shown.
 | Key | Action |
 |---|---|
 | ← / → | Move the block |
-| A / D (Z / X) | Roll all rows left / right |
+| A / D (Z or Y / X) | Roll all rows left / right |
 | W / S (↑) | Roll all columns up / down |
 | ↓ | Soft drop |
 | Space | Hard drop |
 | P | Pause |
-| R | New game (same mode) |
+| R | New game (same mode); after a game also Enter or Space |
 | H / F1 | Help |
 | I | Show the intro (in the menu) |
 | F11 / Alt+Enter | Fullscreen on / off (the image is scaled with its aspect ratio kept) |
@@ -123,24 +126,27 @@ question is shown.
 | Ctrl+C | Copy the seed |
 | Esc | Back to the menu, after asking (the game is paused meanwhile); in the menu: quit |
 
-`ShiftyBits.exe --fullscreen` starts in fullscreen mode.
+`ShiftyBits.exe --fullscreen` (Linux: `shiftybits --fullscreen`) starts in fullscreen mode.
 
 ## Building
 
-Requires `cshiftc` and `clang` (MSYS2 CLANG64). `libminifb.a`, `include/`, `font.txt` and `src/gfx.csh` come from
-`../ShiftTower`.
+Requires the CShift compiler `cshiftc` (release 0.32, the one the workflows use: its Windows archive brings clang and
+the MinGW libraries along; on Linux see below). `libminifb.a` (MiniFB built for Windows), `include/` (its headers),
+`font.txt` and `src/gfx.csh` come from `../ShiftTower`.
 
 ```
-src/               the game, shared by both versions (logic, drawing, music, input, PNG encoder)
+src/               the game, shared by all versions (logic, drawing, menu, intro, achievements, music, input, PNG encoder)
 song*.txt          the four songs, embedded by the game and edited with tools/musiceditor
 intro.txt          the song of the intro (the same format)
 platform/native/   desktop (Windows and Linux): MiniFB window, files; testing.csh writes test images and music
 platform/windows/  Windows: winmm sound (audio.csh), clipboard
 platform/linux/    Linux: ALSA sound (audio.csh), clipboard (wl-copy, xclip or xsel), its project file cshift.json
 tools/musiceditor/ the music editor for Windows (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
+tools/build-linux.sh  builds MiniFB for Linux (into lib/linux/) and the Linux version
 platform/web/      browser: imports from web/shiftybits.js
 web/               index.html, shiftybits.js (host: canvas, keyboard, Web Audio), serve.mjs, cshift.json
 docs/screenshots/  the pictures of this README (rendered by the Windows version in the test mode)
+.github/workflows/ pages.yml (the browser version on GitHub Pages), release.yml (the releases)
 ```
 
 **Windows:**
@@ -159,11 +165,14 @@ tools/build-linux.sh   # -> bin/shiftybits; builds MiniFB into lib/linux/ the fi
 The version is `GameVersion` in [src/version.csh](src/version.csh); it is shown in the title bar, in the menu and in
 the intro.
 
-**Releases:** the notes of a release take the section of the version from [CHANGELOG.md](CHANGELOG.md). Pushing a tag `v<version>` (matching `GameVersion`), or starting the workflow by hand with "publish"
-checked (it then creates the tag), starts
-[.github/workflows/release.yml](.github/workflows/release.yml): it builds and tests the Windows, Linux and browser
-versions and publishes them as a GitHub release (`ShiftyBits-windows-x64.zip`, `ShiftyBits-linux-x64.tar.gz`,
-`ShiftyBits-web.zip`; fixed names, so that the links of the Download section always point to the current release). Started by hand without "publish", the workflow only builds and keeps the packages as artifacts of the run.
+**Releases:** pushing a tag `v<version>` (matching `GameVersion`), or starting the workflow by hand with "publish"
+checked (it then creates the tag), starts [.github/workflows/release.yml](.github/workflows/release.yml). It builds
+and tests the Windows, Linux and browser versions and publishes them as a GitHub release
+(`ShiftyBits-windows-x64.zip`, `ShiftyBits-linux-x64.tar.gz`, `ShiftyBits-web.zip`: fixed names, so that the links of
+the Download section always point to the current release); the notes of the release are the section of the version
+in [CHANGELOG.md](CHANGELOG.md). It also keeps screenshots of the Windows version as the artifact
+`windows-screenshots`. Started by hand without "publish", the workflow only builds and keeps the packages as
+artifacts of the run.
 
 **Browser** (CShift's own wasm backend, no other tools needed):
 
@@ -182,16 +191,17 @@ released. JavaScript then calls the frame function through the function table on
 with the first key press or click (browsers only allow sound after one). In the browser the best values are kept in
 `localStorage` and a screenshot is downloaded.
 
-`ShiftyBits.exe --shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro|awards]` plays a few automatic moves and renders
-one image;
-`ShiftyBits.exe --shot music.wav music` renders the song once through (at least 40 seconds), `music2` to `music4` the other songs, `intromusic` the intro's song, `sounds` only the
-sound effects (all for testing).
+For testing, the desktop version (`ShiftyBits.exe`, on Linux `bin/shiftybits`) renders without a window:
+`--shot image.png [play|over|help|menu|pointer|countdown|score|nonzero|alternate|intro|awards|level2..level20]` plays
+a few automatic moves (or a whole game) and writes one image; `--shot music.wav music` renders the song once through
+(at least 40 seconds), `music2` to `music4` the other songs, `intromusic` the song of the intro, `sounds` only the
+sound effects.
 
 ## Music editor
 
-`tools/musiceditor` is a small editor for the song files (`song.txt` to `song4.txt` and the intro's
-`intro.txt`). It uses the synthesizer and the sound output of the
-game, so a song sounds in the editor as it does in the game.
+`tools/musiceditor` is a small editor for the song files (`song.txt` to `song4.txt` and the intro's `intro.txt`), for
+Windows. It uses the synthesizer and the sound output of the game, so a song sounds in the editor as it does in the
+game.
 
 ```sh
 cshiftc build tools/musiceditor            # -> tools/musiceditor/bin/MusicEditor.exe
@@ -199,10 +209,10 @@ tools/musiceditor/bin/MusicEditor.exe      # edits song.txt of the current folde
 tools/musiceditor/bin/MusicEditor.exe song2.txt
 ```
 
-A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform: sine, triangle, pulse, square, noise or sawtooth;
-volume, attack, decay, sustain, release, vibrato, pitch sweep, detune, a low-pass filter that can open with every
+A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform:
+sine, triangle, pulse, square, noise or sawtooth; volume, attack, decay, sustain, release, vibrato, pitch sweep, detune, a low-pass filter that can open with every
 note (cutoff and pluck), echo) and plays one note at a time; a track can also
-*follow* another one, which plays that track's notes with a second instrument (the song uses it for a quiet sine an
+*follow* another one, which plays that track's notes with a second instrument (NIGHT SKY uses it for a quiet sine an
 octave above the lead).
 
 | Where | What |
@@ -219,7 +229,8 @@ octave above the lead).
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+S | Save |
 
-The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
-the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
+The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the
+same name from the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
 version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
-the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
+the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions
+without a window.
