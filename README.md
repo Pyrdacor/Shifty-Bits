@@ -10,7 +10,7 @@
 </p>
 
 A falling-block puzzle written in CShift. Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
-every tile holds a 0 or a 1. You can **roll** a block: A/D rolls all rows left or right, W/S rolls all columns up or
+every tile holds a 0 or a 1. You can **shift** a block: A/D shifts all rows left or right, W/S shifts all columns up or
 down. No bit ever leaves the block. When a block touches the floor or a resting tile, it becomes fixed.
 
 4 or more equal bits in a row (horizontal or vertical) dissolve, and the tiles above fall down. If that forms new runs,
@@ -57,7 +57,7 @@ option goes back or on, MUSIC and SOUNDS switch with a click, and the buttons do
 tap on the seed opens the on-screen keyboard to type one.
 
 **Touch controls:** on a phone or tablet the browser version shows buttons that send the keys of the keyboard
-controls: at the left moving (held buttons repeat), FASTER and DROP, at the right a cross that rolls the rows and
+controls: at the left moving (held buttons repeat), FASTER and DROP, at the right a cross that shifts the rows and
 columns, at the top PAUSE and fullscreen. While the game is paused or over, buttons for RESUME, NEW GAME,
 SCREENSHOT and MENU take their place (MENU asks first while a game is running, like the MENU button on the screen). Held upright, the game is at the top and the buttons below it; lying, the buttons
 are at the edges of the screen. `?touch=1` at the end of the address shows the buttons on any device, `?touch=0` hides
@@ -68,7 +68,7 @@ them.
 | Normal | Play until the well is full. |
 | Countdown | 1, 3, 5 or 10 minutes: the most points before the time runs out. A chain reaction that is still running at 0:00 is finished and counts. |
 | Score | Reach 1000, 10000, 50000 or 100000 points in the shortest time. The clock stops when the target is reached; a full well ends the game without a time. |
-| Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. The blocks hold a few more 1s (55 %), and none has a row or column of four zeros, which no rolling could save. |
+| Non-zero | The rules of the normal mode, but a run of four or more zeros ends the game: only 1s score. The blocks hold a few more 1s (55 %), and none has a row or column of four zeros, which no shifting could save. |
 | Alternate | The rules of the normal mode, but 1s and 0s must be cleared in turn; either may come first. Clearing 1s and 0s at the same time is always allowed and keeps the turn (after it, the same bit is due again). Clearing the bit that is not due ends the game; every step of a chain reaction counts. The left panel shows which bit is due next. |
 
 Every mode and option has its own best value (a score, or a time in the score mode). The desktop version keeps them
@@ -84,7 +84,7 @@ the game and on the final screen, where Ctrl+C copies it as well.
 
 **Music and sound** come from a small synthesizer written in CShift ([src/music.csh](src/music.csh)): it plays the
 chosen song in a loop (a little faster on higher levels), plus
-sound effects for rolling, landing, clearing (higher with every chain step), level up, game over and a reached
+sound effects for shifting, landing, clearing (higher with every chain step), level up, game over and a reached
 achievement. Music and sound effects are set separately in the menu (the line below the game mode): Enter (or a click)
 on MUSIC goes through the four
 songs (NIGHT SKY in [song.txt](song.txt), DAYBREAK in [song2.txt](song2.txt), OVERCLOCK in [song3.txt](song3.txt),
@@ -112,8 +112,8 @@ question is shown.
 | Key | Action |
 |---|---|
 | ← / → | Move the block |
-| A / D (Z or Y / X) | Roll all rows left / right |
-| W / S (↑) | Roll all columns up / down |
+| A / D (Z or Y / X) | Shift all rows left / right |
+| W / S (↑) | Shift all columns up / down |
 | ↓ | Soft drop |
 | Space | Hard drop |
 | P | Pause |
