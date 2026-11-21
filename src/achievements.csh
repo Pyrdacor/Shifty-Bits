@@ -60,7 +60,7 @@ const ReadOnlySlice<string> _AchText = [
     "CHAIN REACTION OF 2", "CHAIN REACTION OF 3", "CHAIN REACTION OF 4",
     "REACH LEVEL 5", "REACH LEVEL 10", "REACH LEVEL 20", "CLEAR 1000 BITS IN ALL", "CLEAR 10000 BITS IN ALL",
     "SURVIVE 10 MINUTES", "1000 POINTS IN EVERY MODE", "COUNTDOWN 1 MIN: 10000 POINTS",
-    "SCORE MODE: 10000 IN 3 MINUTES", "NON-ZERO MODE: 5000 POINTS", "ALTERNATE MODE: 20 SWITCHES",
+    "SCORE MODE: 10000 IN 3 MINUTES", "NON-ZERO MODE: 1500 POINTS", "ALTERNATE MODE: 20 SWITCHES",
     "PLAY THE SECRET SEED", "WATCH THE WHOLE INTRO",
 ];
 // the numbers of some of them
@@ -218,7 +218,7 @@ struct Achievements
             Unlock(_AchCountdown);
         if (_mode == Mode.Score && _score >= 10000 && _playTime < 180.0)
             Unlock(_AchSprint);
-        if (_mode == Mode.NonZero && _score >= 5000)
+        if (_mode == Mode.NonZero && _score >= 1500)
             Unlock(_AchNonZero);
     }
 
