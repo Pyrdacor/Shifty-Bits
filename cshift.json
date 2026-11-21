@@ -1,6 +1,6 @@
 {
 	"name": "ShiftyBits",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"type": "executable",
 	"sources": ["src", "platform/native", "platform/windows"],
 	"output": "bin/ShiftyBits",

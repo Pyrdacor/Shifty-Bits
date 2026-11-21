@@ -4,4 +4,4 @@
 namespace ShiftyBits;
 
 /// The version of the game.
-const string GameVersion = "1.4";
+const string GameVersion = "1.5";
