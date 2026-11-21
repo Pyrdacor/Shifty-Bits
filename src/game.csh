@@ -316,6 +316,7 @@ struct Game
         _chain = 0;
         _bestChain = 0;
         _paused = false;
+        _confirmQuit = false;
         _pieceCount = 0;
         _playTime = 0.0;
         _newBest = false;

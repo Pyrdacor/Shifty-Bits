@@ -96,8 +96,8 @@ int _totalTiles;
 bool _achLoaded;
 // the right switches of the current game in the alternate mode
 int _altSwitches;
-// the names of newly reached achievements, announced one after the other
-List<string> _achNews = List<string>.Create();
+// newly reached achievements, announced one after the other
+List<int> _achNews = List<int>.Create();
 double _achNewsTime = -10.0;
 // true while the list is shown
 bool _showAwards;
@@ -141,7 +141,7 @@ struct Achievements
             return;
         _achieved |= 1 << index;
         Platform.SaveBest(AchievementSlot, _achieved);
-        _achNews.Add(_AchText[index]);
+        _achNews.Add(index);
         Music.Play(Sfx.Achievement, 0);
     }
 
@@ -234,7 +234,8 @@ struct Achievements
     {
         if (_achNews.Count() == 0 || _time - _achNewsTime < 2.5)
             return;
-        Render.Toast("ACHIEVEMENT: " + _achNews[0]);
+        int index = _achNews[0];
+        Render.Announce(_AchIcon[index], _AchColor[index], _AchText[index]);
         _achNews.RemoveAt(0);
         _achNewsTime = _time;
     }

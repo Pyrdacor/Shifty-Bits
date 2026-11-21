@@ -113,8 +113,8 @@ the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --
 ## Achievements
 
 AWARDS in the menu lists 30 achievements, each with its symbol and a short description: the reached ones in color
-and at the top, the others grey (one stays a secret until it is found). A newly reached one is announced at the
-bottom of the screen with a chime. They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs that dissolve
+and at the top, the others grey (one stays a secret until it is found). A newly reached one is announced with a chime,
+in a game below the panel at the right (off the well). They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs that dissolve
 together count), 0s and 1s at once, 5000 to 300000 points, 1000 points with every song and in every mode, chain
 reactions of 2, 3 and 4, levels 5, 10 and 20, 1000 and 10000 cleared bits in all, 10 minutes in one game, 10000 points
 in the 1-minute countdown, 10000 points in the score mode within 3 minutes, 1500 points in the non-zero mode, 20
@@ -122,6 +122,9 @@ switches in the alternate mode, and watching the whole intro. They are kept with
 in `shiftybits-best.txt`, in the browser in `localStorage`).
 
 ## Controls
+
+During a game the MENU button below the left panel (or Esc) asks whether to quit the game; it is paused while the
+question is shown.
 
 | Key | Action |
 |---|---|
@@ -138,7 +141,7 @@ in `shiftybits-best.txt`, in the browser in `localStorage`).
 | S / F12 | Save a screenshot (on the game over screen) |
 | M | Music on / off |
 | Ctrl+C | Copy the seed |
-| Esc | Back to the menu (in the menu: quit) |
+| Esc | Back to the menu, after asking (the game is paused meanwhile); in the menu: quit |
 
 `ShiftyBits.exe --fullscreen` starts in fullscreen mode.
 

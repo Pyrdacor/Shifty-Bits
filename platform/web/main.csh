@@ -123,7 +123,8 @@ unsafe void _Frame(double dt)
             Input.PointerMove(pointer & 0xfff, (pointer >> 12) & 0xfff);
         _inputStartsSound = false;
     }
-    // the page shows the touch buttons that fit: 0 menu, 1 playing, 2 paused, 3 game over, 4 help, 5 intro
+    // the page shows the touch buttons that fit: 0 menu, 1 playing, 2 paused, 3 game over, 4 help, 5 intro, 6 the
+    // question whether to quit (its buttons are on the canvas)
     int state = 1;
     if (_state == State.Intro)
         state = 5;
@@ -133,6 +134,8 @@ unsafe void _Frame(double dt)
         state = 0;
     else if (_state == State.GameOver)
         state = 3;
+    else if (_confirmQuit)
+        state = 6;
     else if (_paused)
         state = 2;
     web_state(state);

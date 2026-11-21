@@ -277,7 +277,7 @@ const env = {
   web_sound_waiting() { return gestured ? 0 : 1; },
   // what the game is doing, in the order of the names: the page shows the touch buttons that fit
   web_state(state) {
-    const name = ['menu', 'play', 'pause', 'over', 'help', 'intro'][state];
+    const name = ['menu', 'play', 'pause', 'over', 'help', 'intro', 'confirm'][state];
     if (document.body.dataset.state !== name) document.body.dataset.state = name;
   },
   web_seed_rect(x, y, w, h) { seedRect = { x, y, w, h }; },

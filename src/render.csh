@@ -115,6 +115,20 @@ bool _bakedArms;            // whether the tile sprites show the sword and the s
 bool _capturing;            // true while a screenshot frame is rendered (hides prompts)
 string _toast = "";
 double _toastTime;
+// the achievement a message announces (its icon and color), -1 for a plain message
+int _toastIcon = -1;
+uint32 _toastColor;
+
+// the MENU button during a game, and the buttons of the question whether to quit
+const int GameMenuX = 40;
+const int GameMenuY = 636;
+const int GameMenuW = 140;
+const int GameMenuH = 40;
+const int QuitYesX = ScreenW / 2 - 170;
+const int QuitNoX = ScreenW / 2 + 20;
+const int QuitButtonY = ScreenH / 2 + 6;
+const int QuitButtonW = 150;
+const int QuitButtonH = 44;
 
 /// Draws a complete frame.
 struct Render
@@ -150,6 +164,16 @@ struct Render
     {
         _toast = text;
         _toastTime = _time;
+        _toastIcon = -1;
+    }
+
+    /// Announces a reached achievement: its icon and color and what it asked for.
+    static void Announce(int icon, uint32 color, string text)
+    {
+        _toast = text;
+        _toastTime = _time;
+        _toastIcon = icon;
+        _toastColor = color;
     }
 
     /// Draws everything.
@@ -174,8 +198,15 @@ struct Render
             Achievements.Draw();
         if (!_capturing && _toast.Length > 0 && _time - _toastTime < _ToastSeconds)
         {
-            Gfx.BlendRect(0, ScreenH - 40, ScreenW, 32, Gfx.Rgb(6, 8, 20), 200);
-            Gfx.TextCentered(ScreenW / 2, ScreenH - 32, _toast, 2, Gfx.Rgb(170, 255, 170));
+            // in a game the message keeps off the well: it goes below the panel at the right
+            if (_state == State.Menu)
+            {
+                string text = _toastIcon >= 0 ? "ACHIEVEMENT: " + _toast : _toast;
+                Gfx.BlendRect(0, ScreenH - 40, ScreenW, 32, Gfx.Rgb(6, 8, 20), 200);
+                Gfx.TextCentered(ScreenW / 2, ScreenH - 32, text, 2, Gfx.Rgb(170, 255, 170));
+            }
+            else
+                _DrawToastBox();
         }
     }
 
@@ -194,10 +225,79 @@ struct Render
         }
         _DrawEffects();
         _DrawPanels();
+        if (!_capturing)
+            _DrawGameButton(GameMenuX, GameMenuY, GameMenuW, GameMenuH, "MENU", _gameHover == 1, false);
         if (_state == State.GameOver)
             _DrawGameOver();
+        else if (_confirmQuit)
+            _DrawQuitQuestion();
         else if (_paused)
             _DrawBanner("PAUSED", "P: CONTINUE");
+    }
+
+    // a button during a game
+    static void _DrawGameButton(int x, int y, int w, int h, string label, bool hover, bool main)
+    {
+        uint32 gold = Gfx.Rgb(255, 205, 90);
+        Gfx.BlendRect(x, y, w, h, main ? Gfx.Rgb(150, 105, 35) : Gfx.Rgb(60, 54, 96), hover ? 235 : 170);
+        Gfx.FrameRect(x, y, w, h, 2, main || hover ? gold : Gfx.Rgb(120, 110, 160));
+        Gfx.TextCentered(x + w / 2, y + (h - Gfx.TextHeight(3)) / 2, label, 3, Gfx.Rgb(255, 245, 225));
+    }
+
+    // the question whether to leave the running game; the game is paused meanwhile
+    static void _DrawQuitQuestion()
+    {
+        int y = ScreenH / 2 - 100;
+        _Band(200, Gfx.Rgb(255, 210, 90));
+        Gfx.TextCentered(ScreenW / 2, y + 18, "QUIT TO MENU?", 6, Gfx.Rgb(255, 215, 100));
+        Gfx.TextCentered(ScreenW / 2, y + 74, "THE RUNNING GAME WILL BE LOST", 2, Gfx.Rgb(220, 215, 235));
+        _DrawGameButton(QuitYesX, QuitButtonY, QuitButtonW, QuitButtonH, "YES", _gameHover == 2, true);
+        _DrawGameButton(QuitNoX, QuitButtonY, QuitButtonW, QuitButtonH, "NO", _gameHover == 3, false);
+        Gfx.TextCentered(ScreenW / 2, y + 164, "ENTER: YES    ESC: NO", 2, Gfx.Rgb(170, 230, 255));
+    }
+
+    // a message in a game: a box below the right panel, the text broken into lines
+    static void _DrawToastBox()
+    {
+        int x = _PanelRightX;
+        int w = _PanelRightW;
+        bool award = _toastIcon >= 0;
+        int textX = x + (award ? 48 : 12);
+        var lines = _WrapText(_toast, (x + w - 10 - textX) / 12);
+        if (award)
+            lines.Insert(0, "ACHIEVEMENT");
+        int h = Math.Max(award ? 48 : 0, lines.Count() * 18 + 14);
+        int y = ScreenH - 8 - h;
+        Gfx.BlendRect(x, y, w, h, Gfx.Rgb(10, 8, 24), 225);
+        Gfx.FrameRect(x, y, w, h, 2, award ? _toastColor : Gfx.Rgb(120, 200, 120));
+        if (award)
+            Achievements.DrawIcon(_toastIcon, x + 11, y + 10, 3, _toastColor);
+        for (var i = 0; i < lines.Count(); i += 1)
+        {
+            uint32 color = award && i == 0 ? Gfx.Rgb(255, 205, 90) : Gfx.Rgb(230, 240, 230);
+            Gfx.TextShadow(textX, y + 8 + i * 18, lines[i], 2, color);
+        }
+    }
+
+    // `text` broken into lines of at most `width` characters, at the spaces
+    static List<string> _WrapText(string text, int width)
+    {
+        var lines = List<string>.Create();
+        string line = "";
+        foreach (var word in text.Split(' '))
+        {
+            if (word.Length == 0)
+                continue;
+            if (line.Length > 0 && line.Length + 1 + word.Length > width)
+            {
+                lines.Add(line);
+                line = "";
+            }
+            line = line.Length > 0 ? line + " " + word.ToString() : word.ToString();
+        }
+        if (line.Length > 0)
+            lines.Add(line);
+        return lines;
     }
 
     // ---- drawn once ----

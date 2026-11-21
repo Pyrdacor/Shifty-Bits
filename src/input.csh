@@ -29,6 +29,11 @@ const int ModAlt = 4;
 // set by the platform while it hands over the first key press or click of the player: in the browser, that is the
 // moment the sound can start
 bool _inputStartsSound;
+// true while the game asks whether to quit the running game; it is paused meanwhile
+bool _confirmQuit;
+bool _pausedBeforeQuit;
+// what the pointer is over during a game: 1 the MENU button, 2 YES, 3 NO, 0 nothing
+int _gameHover;
 
 /// Turns key presses into game actions.
 struct Input
@@ -73,9 +78,20 @@ struct Input
             Menu.Key(k, mods);
             return;
         }
+        if (_confirmQuit)
+        {
+            if (k == KeyEnter || k == KeyPadEnter || k == ' ' || k == 'Y')
+                _Quit();
+            else if (k == KeyEscape || k == 'N')
+                _Stay();
+            return;
+        }
         if (k == KeyEscape)
         {
-            Menu.Open();
+            if (_state == State.GameOver)
+                Menu.Open();
+            else
+                _AskQuit();
             return;
         }
         if (_state == State.GameOver)
@@ -128,12 +144,71 @@ struct Input
         }
         else if (_state == State.Menu)
             Menu.Pointer(x, y);
+        else
+        {
+            int element = _GameElementAt(x, y);
+            if (element == 2)
+                _Quit();
+            else if (element == 3)
+                _Stay();
+            else if (element == 1)
+            {
+                // after a game there is nothing to lose
+                if (_state == State.GameOver)
+                    Menu.Open();
+                else
+                    _AskQuit();
+            }
+        }
     }
 
     /// Handles the mouse moving to a pixel of the screen.
     static void PointerMove(int x, int y)
     {
         Menu.Hover(x, y);
+        _gameHover = _state == State.Menu || _state == State.Intro ? 0 : _GameElementAt(x, y);
+    }
+
+    // the button of a game at a pixel: 1 MENU, 2 YES, 3 NO (only while the question is shown), 0 none
+    static int _GameElementAt(int x, int y)
+    {
+        if (_confirmQuit)
+        {
+            if (y >= QuitButtonY && y < QuitButtonY + QuitButtonH)
+            {
+                if (x >= QuitYesX && x < QuitYesX + QuitButtonW)
+                    return 2;
+                if (x >= QuitNoX && x < QuitNoX + QuitButtonW)
+                    return 3;
+            }
+            return 0;
+        }
+        if (x >= GameMenuX && x < GameMenuX + GameMenuW && y >= GameMenuY && y < GameMenuY + GameMenuH)
+            return 1;
+        return 0;
+    }
+
+    // asks whether to quit the running game, and pauses it meanwhile
+    static void _AskQuit()
+    {
+        _pausedBeforeQuit = _paused;
+        _paused = true;
+        Music.SetPaused(true);
+        _confirmQuit = true;
+    }
+
+    static void _Quit()
+    {
+        _confirmQuit = false;
+        Menu.Open();
+    }
+
+    // back to the game, paused if it was paused before
+    static void _Stay()
+    {
+        _confirmQuit = false;
+        _paused = _pausedBeforeQuit;
+        Music.SetPaused(_paused);
     }
 
     /// Renders the screen without prompts, encodes it as PNG and hands it to the platform to store.

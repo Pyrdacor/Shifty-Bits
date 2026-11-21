@@ -88,6 +88,7 @@ struct Menu
         Achievements.Save();
         _state = State.Menu;
         _paused = false;
+        _confirmQuit = false;
         _menuRow = _RowMode;
         Music.Stop();
         if (!_seedFixed)

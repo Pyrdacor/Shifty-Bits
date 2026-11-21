@@ -3,6 +3,8 @@
 ## 1.3
 
 - Achievements: 30 goals, listed under AWARDS in the menu and announced in the game when they are reached.
+- A MENU button during the game; it (and Esc) asks before quitting the game and pauses it meanwhile.
+- Messages during a game (achievements, music on/off, ...) appear below the panel at the right, off the well.
 - Non-zero mode: no more blocks with a row or column of four zeros (they ended the game wherever they landed), and
   a few more 1s (55 %). The other modes keep the blocks of their seeds.
 
