@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4
+
+- The game says "shift" instead of "roll": in the key list, the help, the touch controls and the intro.
+- The release files have fixed names (`ShiftyBits-windows-x64.zip`, `ShiftyBits-linux-x64.tar.gz`,
+  `ShiftyBits-web.zip`), so that links to the latest release always work; the README has them in a Download section,
+  next to screenshots.
+
 ## 1.3
 
 - Achievements: 30 goals, listed under AWARDS in the menu and announced in the game when they are reached.
