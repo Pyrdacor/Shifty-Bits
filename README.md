@@ -25,6 +25,24 @@ A block that locks (partly) above the red line ends the game. Every 30 cleared t
 faster (up to level 20) and get bigger (at most 3 tiles at first, up to 4x4 from level 8), and the tiles change
 their colors (8 pairs of colors that repeat).
 
+Made by **Pyrdacor** for a game jam with the theme **"Shift"**.
+
+## Features
+
+- **5 game modes**
+  - **Normal:** play until the well is full.
+  - **Countdown:** the most points in 1, 3, 5 or 10 minutes.
+  - **Score:** reach a target score as fast as you can.
+  - **Non-Zero:** only 1s may be cleared – four zeros in a row end the game.
+  - **Alternate:** clear 1s and 0s in turn – clear the wrong bit and it's over.
+- **30 achievements** to unlock, from big clears and chain reactions to mode challenges (and one secret).
+- **Seeds:** every game has a seed – enter the same seed to get the same blocks and challenge your friends.
+- **A demoscene-style intro** with copper bars, parallax mountains, sine scrollers and its own chiptune.
+- **4 original chiptune songs** and retro sound effects, all from a tiny synthesizer written from scratch.
+- **8 color themes** that change as you level up, up to level 20.
+- **Touch controls** on phones and tablets.
+- Graphics, music and sound are all generated in code – no engine, no assets.
+
 ## Download
 
 The current release, ready to play:
