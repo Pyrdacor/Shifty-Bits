@@ -9,7 +9,9 @@
   <img src="docs/screenshots/awards.png" width="49%" alt="The list of the achievements">
 </p>
 
-A falling-block puzzle written in CShift. Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
+A falling-block puzzle written in [CShift](https://github.com/Robert-Schneckenhaus/CShift), a native, C#-like systems
+language that also compiles to WebAssembly ([documentation](https://robert-schneckenhaus.github.io/CShift/),
+[playground](https://robert-schneckenhaus.github.io/CShift/v0/playground/)). Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
 every tile holds a 0 or a 1. You can **shift** a block: A/D shifts all rows left or right, W/S shifts all columns up or
 down. No bit ever leaves the block. When a block touches the floor or a resting tile, it becomes fixed.
 
@@ -130,7 +132,7 @@ question is shown.
 
 ## Building
 
-Requires the CShift compiler `cshiftc` (release 0.32, the one the workflows use: its Windows archive brings clang and
+Requires the [CShift](https://github.com/Robert-Schneckenhaus/CShift) compiler `cshiftc` ([release 0.32](https://github.com/Robert-Schneckenhaus/CShift/releases/tag/v0.32), the one the workflows use: its Windows archive brings clang and
 the MinGW libraries along; on Linux see below). `libminifb.a` (MiniFB built for Windows), `include/` (its headers),
 `font.txt` and `src/gfx.csh` come from `../ShiftTower`.
 
