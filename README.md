@@ -116,7 +116,7 @@ AWARDS in the menu lists 30 achievements, each with its symbol and a short descr
 and at the top, the others grey (one stays a secret until it is found). A newly reached one is announced with a chime,
 in a game below the panel at the right (off the well). They ask for clearing 5, 7, 9, 11 or 15 bits at once (all runs that dissolve
 together count), 0s and 1s at once, 5000 to 300000 points, 1000 points with every song and in every mode, chain
-reactions of 2, 3 and 4, levels 5, 10 and 20, 1000 and 10000 cleared bits in all, 10 minutes in one game, 10000 points
+reactions of 2, 3 and 4, levels 5, 10 and 20, 1000 and 10000 cleared bits in all, 10 minutes in one game, 2500 points
 in the 1-minute countdown, 10000 points in the score mode within 3 minutes, 1500 points in the non-zero mode, 20
 switches in the alternate mode, and watching the whole intro. They are kept with the best values (three more lines
 in `shiftybits-best.txt`, in the browser in `localStorage`).
