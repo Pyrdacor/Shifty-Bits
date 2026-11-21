@@ -52,7 +52,10 @@ jobs:
     needs: version
     runs-on: windows-latest
     env:
+      # the folder in the archive carries the version; the archive itself has a fixed name, so that the README can
+      # link to releases/latest/download/<name>
       PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-windows-x64
+      ARCHIVE: ShiftyBits-windows-x64
     steps:
       - uses: actions/checkout@v7
 
@@ -125,12 +128,12 @@ jobs:
           New-Item -ItemType Directory "$env:PACKAGE" | Out-Null
           Copy-Item bin\ShiftyBits.exe, README.md "$env:PACKAGE\"
           Copy-Item include\LICENSE-MiniFB "$env:PACKAGE\LICENSE-MiniFB.txt"
-          Compress-Archive "$env:PACKAGE" "$env:PACKAGE.zip"
+          Compress-Archive "$env:PACKAGE" "$env:ARCHIVE.zip"
 
       - uses: actions/upload-artifact@v4
         with:
           name: package-windows
-          path: ${{ env.PACKAGE }}.zip
+          path: ${{ env.ARCHIVE }}.zip
 
   linux:
     needs: version
@@ -138,6 +141,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-linux-x64
+      ARCHIVE: ShiftyBits-linux-x64
     steps:
       - uses: actions/checkout@v7
 
@@ -172,18 +176,19 @@ jobs:
           mkdir "$PACKAGE"
           cp bin/shiftybits README.md "$PACKAGE/"
           cp include/LICENSE-MiniFB "$PACKAGE/LICENSE-MiniFB.txt"
-          tar -czf "$PACKAGE.tar.gz" "$PACKAGE"
+          tar -czf "$ARCHIVE.tar.gz" "$PACKAGE"
 
       - uses: actions/upload-artifact@v4
         with:
           name: package-linux
-          path: ${{ env.PACKAGE }}.tar.gz
+          path: ${{ env.ARCHIVE }}.tar.gz
 
   web:
     needs: version
     runs-on: ubuntu-latest
     env:
       PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-web
+      ARCHIVE: ShiftyBits-web
     steps:
       - uses: actions/checkout@v7
 
@@ -199,12 +204,12 @@ jobs:
           cshiftc build web
           mkdir "$PACKAGE"
           cp web/index.html web/shiftybits.js web/shiftybits.wasm web/serve.mjs "$PACKAGE/"
-          zip -r "$PACKAGE.zip" "$PACKAGE"
+          zip -r "$ARCHIVE.zip" "$PACKAGE"
 
       - uses: actions/upload-artifact@v4
         with:
           name: package-web
-          path: ${{ env.PACKAGE }}.zip
+          path: ${{ env.ARCHIVE }}.zip
 
   release:
     if: github.ref_type == 'tag' || inputs.publish
@@ -236,14 +241,19 @@ jobs:
 
           | Package | |
           |---|---|
-          | \`ShiftyBits-$VERSION-windows-x64.zip\` | Windows 10/11 (64 bit): unpack and start \`ShiftyBits.exe\` |
-          | \`ShiftyBits-$VERSION-linux-x64.tar.gz\` | Linux (64 bit, glibc 2.35 or newer, e.g. Ubuntu 22.04+, Debian 12+): unpack and start \`shiftybits\`. Needs X11 (or XWayland), OpenGL and ALSA, which a desktop has; copying and pasting the seed uses \`wl-copy\`, \`xclip\` or \`xsel\` if one is installed |
-          | \`ShiftyBits-$VERSION-web.zip\` | The browser version to host yourself (\`node serve.mjs\` serves it locally) |
+          | \`ShiftyBits-windows-x64.zip\` | Windows 10/11 (64 bit): unpack and start \`ShiftyBits.exe\` |
+          | \`ShiftyBits-linux-x64.tar.gz\` | Linux (64 bit, glibc 2.35 or newer, e.g. Ubuntu 22.04+, Debian 12+): unpack and start \`shiftybits\`. Needs X11 (or XWayland), OpenGL and ALSA, which a desktop has; copying and pasting the seed uses \`wl-copy\`, \`xclip\` or \`xsel\` if one is installed |
+          | \`ShiftyBits-web.zip\` | The browser version to host yourself (\`node serve.mjs\` serves it locally) |
 
           Or play it in the browser: https://pyrdacor.github.io/Shifty-Bits/
 
           The best values, the settings and the screenshots are kept in the folder the game is started in.
           EOF
-          # for a pushed tag that tag; started by hand, the tag of the version is created on the commit that was built
+          # for a pushed tag that tag; started by hand, the tag of the version is created on the commit that was built.
+          # A release of this version that exists already gets the packages added (or replaced).
           tag="v$VERSION"
-          gh release create "$tag" packages/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Shifty Bits $VERSION" --notes-file notes.md
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$tag" packages/* --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$tag" packages/* --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "Shifty Bits $VERSION" --notes-file notes.md
+          fi

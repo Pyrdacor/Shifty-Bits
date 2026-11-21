@@ -16,6 +16,18 @@ A block that locks (partly) above the red line ends the game. Every 30 cleared t
 faster (up to level 20) and get bigger (at most 3 tiles at first, up to 4x4 from level 8), and the tiles change
 their colors (8 pairs of colors that repeat).
 
+## Download
+
+The current release, ready to play:
+
+| System | Download | |
+|---|---|---|
+| Windows 10/11 (64 bit) | [ShiftyBits-windows-x64.zip](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-windows-x64.zip) | unpack and start `ShiftyBits.exe` |
+| Linux (64 bit) | [ShiftyBits-linux-x64.tar.gz](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-linux-x64.tar.gz) | unpack and start `shiftybits`; glibc 2.35 or newer (Ubuntu 22.04+, Debian 12+), X11 or XWayland, OpenGL and ALSA |
+| Browser | [play it online](https://pyrdacor.github.io/Shifty-Bits/), or [ShiftyBits-web.zip](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-web.zip) to host it yourself | `node serve.mjs` serves it locally |
+
+All versions and what changed: [releases](https://github.com/Pyrdacor/Shifty-Bits/releases), [CHANGELOG.md](CHANGELOG.md).
+
 ## Intro
 
 The game starts with a little intro in the style of the Amiga and Atari ST demo scene ([src/intro.csh](src/intro.csh)):
@@ -72,43 +84,6 @@ music off and on at any time. The settings are remembered.
 
 After a game, **S** (or F12) saves a screenshot of the final screen, with the date instead of the prompts, as
 `screenshots/shiftybits-YYYYMMDD-HHMMSS.png`.
-
-## Music editor
-
-`tools/musiceditor` is a small editor for the song files (`song.txt` to `song4.txt` and the intro's
-`intro.txt`). It uses the synthesizer and the sound output of the
-game, so a song sounds in the editor as it does in the game.
-
-```sh
-cshiftc build tools/musiceditor            # -> tools/musiceditor/bin/MusicEditor.exe
-tools/musiceditor/bin/MusicEditor.exe      # edits song.txt of the current folder (or of a folder above)
-tools/musiceditor/bin/MusicEditor.exe song2.txt
-```
-
-A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform: sine, triangle, pulse, square, noise or sawtooth;
-volume, attack, decay, sustain, release, vibrato, pitch sweep, detune, a low-pass filter that can open with every
-note (cutoff and pluck), echo) and plays one note at a time; a track can also
-*follow* another one, which plays that track's notes with a second instrument (the song uses it for a quiet sine an
-octave above the lead).
-
-| Where | What |
-|---|---|
-| Grid | Click sets a note, dragging to the right makes it longer, a right click deletes it. The wheel scrolls the notes, Shift+wheel the bars. The notes of the other tracks are shown faintly. |
-| Piano keys | Click to hear a note with the instrument of the track |
-| Track list | Select a track; **M** mutes it (saved with the song), **S** plays it alone (not saved). NEW, DUP, DEL and NAME below the list. |
-| Instrument | `-` and `+` change a value (Shift: 10 steps), the wheel works too; the changed sound is played |
-| Overview | One row per track, one cell per bar: click to go there |
-| Space | Play from the selected bar / stop. LOOP switches between the whole song and the two bars shown. |
-| ← → / ↑ ↓ | Select the bar / the track |
-| Ctrl+C / Ctrl+V | Copy and paste the selected bar of the track (Ctrl+Shift+C: of all tracks) |
-| Del | Clear the selected bar (Shift: of all tracks) |
-| Ctrl+Z / Ctrl+Y | Undo / redo |
-| Ctrl+S | Save |
-
-The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
-the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
-version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
-the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
 
 ## Achievements
 
@@ -181,8 +156,8 @@ the intro.
 **Releases:** the notes of a release take the section of the version from [CHANGELOG.md](CHANGELOG.md). Pushing a tag `v<version>` (matching `GameVersion`), or starting the workflow by hand with "publish"
 checked (it then creates the tag), starts
 [.github/workflows/release.yml](.github/workflows/release.yml): it builds and tests the Windows, Linux and browser
-versions and publishes them as a GitHub release (`ShiftyBits-<version>-windows-x64.zip`, `-linux-x64.tar.gz`,
-`-web.zip`). Started by hand without "publish", the workflow only builds and keeps the packages as artifacts of the run.
+versions and publishes them as a GitHub release (`ShiftyBits-windows-x64.zip`, `ShiftyBits-linux-x64.tar.gz`,
+`ShiftyBits-web.zip`; fixed names, so that the links of the Download section always point to the current release). Started by hand without "publish", the workflow only builds and keeps the packages as artifacts of the run.
 
 **Browser** (CShift's own wasm backend, no other tools needed):
 
@@ -205,3 +180,40 @@ with the first key press or click (browsers only allow sound after one). In the 
 one image;
 `ShiftyBits.exe --shot music.wav music` renders the song once through (at least 40 seconds), `music2` to `music4` the other songs, `intromusic` the intro's song, `sounds` only the
 sound effects (all for testing).
+
+## Music editor
+
+`tools/musiceditor` is a small editor for the song files (`song.txt` to `song4.txt` and the intro's
+`intro.txt`). It uses the synthesizer and the sound output of the
+game, so a song sounds in the editor as it does in the game.
+
+```sh
+cshiftc build tools/musiceditor            # -> tools/musiceditor/bin/MusicEditor.exe
+tools/musiceditor/bin/MusicEditor.exe      # edits song.txt of the current folder (or of a folder above)
+tools/musiceditor/bin/MusicEditor.exe song2.txt
+```
+
+A song has up to 12 tracks and up to 64 bars of 16 steps (16th notes). Every track has its own instrument (waveform: sine, triangle, pulse, square, noise or sawtooth;
+volume, attack, decay, sustain, release, vibrato, pitch sweep, detune, a low-pass filter that can open with every
+note (cutoff and pluck), echo) and plays one note at a time; a track can also
+*follow* another one, which plays that track's notes with a second instrument (the song uses it for a quiet sine an
+octave above the lead).
+
+| Where | What |
+|---|---|
+| Grid | Click sets a note, dragging to the right makes it longer, a right click deletes it. The wheel scrolls the notes, Shift+wheel the bars. The notes of the other tracks are shown faintly. |
+| Piano keys | Click to hear a note with the instrument of the track |
+| Track list | Select a track; **M** mutes it (saved with the song), **S** plays it alone (not saved). NEW, DUP, DEL and NAME below the list. |
+| Instrument | `-` and `+` change a value (Shift: 10 steps), the wheel works too; the changed sound is played |
+| Overview | One row per track, one cell per bar: click to go there |
+| Space | Play from the selected bar / stop. LOOP switches between the whole song and the two bars shown. |
+| ← → / ↑ ↓ | Select the bar / the track |
+| Ctrl+C / Ctrl+V | Copy and paste the selected bar of the track (Ctrl+Shift+C: of all tracks) |
+| Del | Clear the selected bar (Shift: of all tracks) |
+| Ctrl+Z / Ctrl+Y | Undo / redo |
+| Ctrl+S | Save |
+
+The game embeds the four song files and `intro.txt` when it is built. The desktop game also reads a song file of the same name from
+the folder it is started in, so a saved song can be heard in the game at its next start without building; the browser
+version needs a new build. The name of a song shown in the menu is its `name` line (up to 11 characters are shown);
+the editor keeps it, to change it edit the line in the file. `MusicEditor.exe --selftest` checks the editing functions without a window.
