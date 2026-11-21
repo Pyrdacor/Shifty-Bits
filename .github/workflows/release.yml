@@ -187,7 +187,6 @@ jobs:
     needs: version
     runs-on: ubuntu-latest
     env:
-      PACKAGE: ShiftyBits-${{ needs.version.outputs.version }}-web
       ARCHIVE: ShiftyBits-web
     steps:
       - uses: actions/checkout@v7
@@ -202,9 +201,8 @@ jobs:
       - name: Build and package
         run: |
           cshiftc build web
-          mkdir "$PACKAGE"
-          cp web/index.html web/shiftybits.js web/shiftybits.wasm web/serve.mjs "$PACKAGE/"
-          zip -r "$ARCHIVE.zip" "$PACKAGE"
+          # the files at the top of the archive, with index.html there: what itch.io and other hosts of HTML games expect
+          zip -j "$ARCHIVE.zip" web/index.html web/shiftybits.js web/shiftybits.wasm web/serve.mjs
 
       - uses: actions/upload-artifact@v4
         with:

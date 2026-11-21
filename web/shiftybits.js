@@ -330,7 +330,16 @@ const env = {
 
 // ---- start ----
 
-const { instance } = await WebAssembly.instantiateStreaming(fetch('shiftybits.wasm'), { wasi_snapshot_preview1: wasi, env });
+// streaming needs the server to send the file as application/wasm; where it does not (some hosts), the bytes are
+// compiled after the download instead
+const imports = { wasi_snapshot_preview1: wasi, env };
+let instance;
+try {
+  ({ instance } = await WebAssembly.instantiateStreaming(fetch('shiftybits.wasm'), imports));
+} catch (e) {
+  const bytes = await (await fetch('shiftybits.wasm')).arrayBuffer();
+  ({ instance } = await WebAssembly.instantiate(bytes, imports));
+}
 memory = instance.exports.memory;
 try {
   instance.exports._start();

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5
+
+- `ShiftyBits-web.zip` has its files at the top (with `index.html`), ready to upload to itch.io, and the browser
+  version also starts where a server sends the WebAssembly file with another type.
+
 ## 1.4
 
 - The game says "shift" instead of "roll": in the key list, the help, the touch controls and the intro.

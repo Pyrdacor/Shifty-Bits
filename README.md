@@ -33,7 +33,7 @@ The current release, ready to play:
 |---|---|---|
 | Windows 10/11 (64 bit) | [ShiftyBits-windows-x64.zip](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-windows-x64.zip) | unpack and start `ShiftyBits.exe` |
 | Linux (64 bit) | [ShiftyBits-linux-x64.tar.gz](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-linux-x64.tar.gz) | unpack and start `shiftybits`; glibc 2.35 or newer (Ubuntu 22.04+, Debian 12+), X11 or XWayland, OpenGL and ALSA |
-| Browser | [play it online](https://pyrdacor.github.io/Shifty-Bits/), or [ShiftyBits-web.zip](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-web.zip) to host it yourself | `node serve.mjs` serves it locally |
+| Browser | [play it online](https://pyrdacor.github.io/Shifty-Bits/), or [ShiftyBits-web.zip](https://github.com/Pyrdacor/Shifty-Bits/releases/latest/download/ShiftyBits-web.zip) to host it yourself | its files are at the top of the archive (`index.html` there), as itch.io and similar hosts expect; `node serve.mjs` serves it locally |
 
 All versions and what changed: [releases](https://github.com/Pyrdacor/Shifty-Bits/releases), [CHANGELOG.md](CHANGELOG.md).
 
