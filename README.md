@@ -2,6 +2,11 @@
 
 **[Play it in the browser](https://pyrdacor.github.io/Shifty-Bits/)**
 
+| | |
+|---|---|
+| ![The intro: copper bars, mountains and chains of bits](docs/screenshots/intro.png) | ![The menu](docs/screenshots/menu.png) |
+| ![A game, with an achievement announced at the right](docs/screenshots/play.png) | ![The list of the achievements](docs/screenshots/awards.png) |
+
 A falling-block puzzle written in CShift. Rectangular blocks (1x2, 2x1, 3x1 ... up to 4x4) fall from the top, and
 every tile holds a 0 or a 1. You can **roll** a block: A/D rolls all rows left or right, W/S rolls all columns up or
 down. No bit ever leaves the block. When a block touches the floor or a resting tile, it becomes fixed.
@@ -135,6 +140,7 @@ platform/linux/    Linux: ALSA sound (audio.csh), clipboard (wl-copy, xclip or x
 tools/musiceditor/ the music editor for Windows (shares gfx.csh, song.csh, music.csh and audio.csh with the game)
 platform/web/      browser: imports from web/shiftybits.js
 web/               index.html, shiftybits.js (host: canvas, keyboard, Web Audio), serve.mjs, cshift.json
+docs/screenshots/  the pictures of this README (rendered by the Windows version in the test mode)
 ```
 
 **Windows:**
